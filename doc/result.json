@@ -1,0 +1,3318 @@
+[
+    {
+        "id": "DT",
+        "name": "Welcome",
+        "type": "Multiple Choice",
+        "text": "Greetings, I am really glad to have your precious time on the tech stack survey which will progress a lot and can effect our daily life in future.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.- Programmer Comment: Add Image of AI, XR and Simulation if possibleDT.Greetings, I am really glad to have your precious time on the tech stack survey which will progress a lot and can effect our daily life in future.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "DT",
+        "type": "Multiple Choice",
+        "text": "Greetings, I am really glad to have your precious time on the tech stack survey which will progress a lot and can effect our daily life in future.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S1",
+        "name": "Name",
+        "type": "Multiple Choice",
+        "text": "What is your Name?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S1.What is your Name?Enter your response in the box.Mr. / Mrs.MIN: 3. MAX: 30.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S1",
+        "name": "S1",
+        "type": "Open Ended",
+        "text": "What is your Name?\nEnter your response in the box.\nMr. / Mrs. MIN: 3. MAX: 30.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S2",
+        "name": "Email",
+        "type": "Multiple Choice",
+        "text": "What is your Email Id?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S2.What is your Email Id?Enter your response in the box.MIN: 11. MAX: 50. 999.    I don't want to answer - NoAnswer",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S2",
+        "name": "S2",
+        "type": "Open Ended",
+        "text": "What is your Email Id?\nEnter your response in the box.\nMIN: 11. MAX: 50.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "999",
+                "text": "I don't want to answer - NoAnswer",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "S3",
+        "name": "Age",
+        "type": "Multiple Choice",
+        "text": "What is your age?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S3.What is your age?Enter a numeric response.MIN: 14. MAX: 70. INTEGER NUMERIC RESPONSES.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S3",
+        "name": "S3",
+        "type": "Open Ended",
+        "text": "What is your age?\nEnter a numeric response.\nMIN: 14. MAX: 70. INTEGER NUMERIC RESPONSES.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S4",
+        "name": "Gender",
+        "type": "Multiple Choice",
+        "text": "Gender",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S4.GenderSelect one response.DEFAULT ORDER.1.Male - Male2.Female - Female3.Non Binary - NonBinary",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S4",
+        "name": "S4",
+        "type": "Single Choice",
+        "text": "Gender\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Male - Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Female - Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Non Binary - NonBinary",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "S5",
+        "name": "Zip",
+        "type": "Multiple Choice",
+        "text": "What is your Zip code?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S5.What is your Zip code?Enter your response in the box.MIN: 5. MAX: 5.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S5",
+        "name": "S5",
+        "type": "Open Ended",
+        "text": "What is your Zip code?\nEnter your response in the box.\nMIN: 5. MAX: 5.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S6",
+        "name": "Profession",
+        "type": "Multiple Choice",
+        "text": "What is your current profession?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S6.What is your current profession?Select one response.DEFAULT ORDER.1.Student - Student2.Doctor - Doctor3.Engineer - Engineer4.Teacher - Teacher5.Chef - Chef6.Scientist - Scientist7.Others (please specify) - Others__________",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S6",
+        "name": "S6",
+        "type": "Single Choice",
+        "text": "What is your current profession?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Student - Student",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Doctor - Doctor",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Engineer - Engineer",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Teacher - Teacher",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Chef - Chef",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "6",
+                "text": "Scientist - Scientist",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "7",
+                "text": "Others (please specify) - Others__________",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "S7",
+        "name": "Income",
+        "type": "Multiple Choice",
+        "text": "What is your annual Income?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.S7.What is your annual Income?Select one response.DEFAULT ORDER.1.100000 - 300000 - _1000003000002.300001 - 500000 - _3000015000003.500001 - 600000 - _5000016000004.600001 - 800000 - _6000018000005.800001 plus - _800001Plus6.I don't earn yet - None",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S7",
+        "name": "S7",
+        "type": "Single Choice",
+        "text": "What is your annual Income?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "100000 - 300000 - _100000300000",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "300001 - 500000 - _300001500000",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "500001 - 600000 - _500001600000",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "600001 - 800000 - _600001800000",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "800001 plus - _800001Plus",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "6",
+                "text": "I don't earn yet - None",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "S8",
+        "name": "Aware",
+        "type": "Multiple Choice",
+        "text": "Are you aware of any of the technologies?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.- Terminate Immediately if respondent selected code [None] at S8.S8.Are you aware of any of the technologies?Select all that apply.DEFAULT ORDER.1.Artificial Intelligence (AI) - AI2.Simulation - Simulation3.Extended Reality (XR) - ExtendedRealityPC: If choose XR, ask question based on AR, VR and MR4.Not aware of any - NoneEXCLUSIVE.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": "[Aware]- Show to all.- Terminate Immediately if respondent selected code [None] at S8.S8.Are you aware of any of the technologies?Select all that apply.DEFAULT ORDER.1.Artificial Intelligence (AI) - AI2.Simulation - Simulation3.Extended Reality (XR) - ExtendedRealityPC: If choose XR, ask question based on AR, VR and MR4.Not aware of any - NoneEXCLUSIVE.",
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "S8",
+        "name": "S8",
+        "type": "Multi Punch",
+        "text": "Are you aware of any of the technologies?\nSelect all that apply.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Artificial Intelligence (AI) - AI",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Simulation - Simulation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Extended Reality (XR) - ExtendedReality",
+                "showLogic": {
+                    "text": "PC: If choose XR, ask question based on AR, VR and MR",
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "EXCLUSIVE",
+        "name": "EXCLUSIVE",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "AI",
+        "type": "Multiple Choice",
+        "text": "AI: Artificial Intelligence refers to the ability of machines to perform tasks that would normally require human intelligence. e.g. Chatbots or Voice Assistant.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.DT.AI: Artificial Intelligence refers to the ability of machines to perform tasks that would normally require human intelligence. e.g. Chatbots or Voice Assistant.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "DT",
+        "type": "Multiple Choice",
+        "text": "AI: Artificial Intelligence refers to the ability of machines to perform tasks that would normally require human intelligence. e.g. Chatbots or Voice Assistant.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "XR",
+        "type": "Multiple Choice",
+        "text": "XR: Extended Reality technologies use computer-generated images or overlay digital information onto the real world, creating immersive and interactive experiences for the user    •     AR: AR is like putting a digital sticker on the real world through devices like Phone or Tablet.    •     VR: VR involves the use of headsets to immerse the user in a fully digital environment.    •     MR: MR is like placing a virtual object in the real world that looks like it is really there and can interact with the environment.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.DT.XR: Extended Reality technologies use computer-generated images or overlay digital information onto the real world, creating immersive and interactive experiences for the user    •     AR: AR is like putting a digital sticker on the real world through devices like Phone or Tablet.    •     VR: VR involves the use of headsets to immerse the user in a fully digital environment.    •     MR: MR is like placing a virtual object in the real world that looks like it is really there and can interact with the environment.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "DT",
+        "type": "Multiple Choice",
+        "text": "XR: Extended Reality technologies use computer-generated images or overlay digital information onto the real world, creating immersive and interactive experiences for the user    •     AR: AR is like putting a digital sticker on the real world through devices like Phone or Tablet.    •     VR: VR involves the use of headsets to immerse the user in a fully digital environment.    •     MR: MR is like placing a virtual object in the real world that looks like it is really there and can interact with the environment.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "Simulation",
+        "type": "Multiple Choice",
+        "text": "Simulation: Simulations refers to the process of creating a model or representation of a system or process in order to study its behavior or test hypotheses.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.DT.Simulation: Simulations refers to the process of creating a model or representation of a system or process in order to study its behavior or test hypotheses.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DT",
+        "name": "DT",
+        "type": "Multiple Choice",
+        "text": "Simulation: Simulations refers to the process of creating a model or representation of a system or process in order to study its behavior or test hypotheses.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_Gender",
+        "name": "DV_Gender",
+        "type": "Multiple Choice",
+        "text": "Respondent Gender",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_Gender",
+        "name": "DV_Gender",
+        "type": "Single Choice",
+        "text": "Respondent Gender\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Male - Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Female - Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "DV_AgeRange",
+        "name": "DV_AgeRange",
+        "type": "Multiple Choice",
+        "text": "Age range groups",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_AgeRange",
+        "name": "DV_AgeRange",
+        "type": "Multiple Choice",
+        "text": "Age range groups\nSelect the age group",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "2",
+                "text": "16 to 24 - _1624",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "25 to 33 - _2533",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "34 to 42 - _3442",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "43 to 51 - _4351",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "6",
+                "text": "51 to 60 - _5160",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "DV_GenderAge",
+        "name": "DV_GenderAge",
+        "type": "Multiple Choice",
+        "text": "Combination of Age and Gender",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_GenderAge",
+        "name": "DV_GenderAge",
+        "type": "Single Choice",
+        "text": "Combination of Age and Gender\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "16 to 24 Male - _1624Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "16 to 24 Female - _1624Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "25 to 33 Male - _2533Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "25 to 33 Female - _2533Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "34 to 42 Male - _3442Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "6",
+                "text": "34 to 42 Female - _3442Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "7",
+                "text": "43 to 51 Male - _4351Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "8",
+                "text": "43 to 51 Female - _4351Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "9",
+                "text": "52 to 60 Male - _5260Male",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "10",
+                "text": "52 to 60 Female - _5260Female",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "DV_Aware",
+        "name": "DV_Aware",
+        "type": "Multiple Choice",
+        "text": "DV_Aware",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_Aware",
+        "name": "DV_Aware",
+        "type": "Multi Punch",
+        "text": "DV_Aware\nSelect all that apply.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Artificial Intelligence (AI) - AI",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Simulation - Simulation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Extended Reality (XR) - ExtendedReality",
+                "showLogic": {
+                    "text": "PC: If choose XR, ask question based on AR, VR and MR",
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "DV_TechAssigned",
+        "name": "DV_TechAssigned",
+        "type": "Multiple Choice",
+        "text": "Assigner",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": "[DV_TechAssigned]- Hidden Question. Applies to all.DV_TechAssigned.AssignerSelect all that apply.Eligibility variable: DV_AwareMaximum number of categories to assign: 3If less than 1 category is assigned: TerminateStep 1:Assignment type: Most NeededMaximum number of categories that can be assigned to this step: 1Only assign specific categories?: No, anything eligible can be assignedStep 2:Assignment type: RandomMaximum number of categories that can be assigned to this step: 1Only assign specific categories?: No, anything eligible can be assignedStep 3:Assignment type: Most NeededMaximum number of categories that can be assigned to this step: 1Only assign specific categories?: No, anything eligible can be assigned",
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "DV_TechAssigned",
+        "name": "DV_TechAssigned",
+        "type": "Multi Punch",
+        "text": "Assigner\nSelect all that apply.\nQuestion number Termination logic statement Termination type\nS8 Terminate Immediately if respondent selected code [None] at S8 Immediately",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Challenges",
+        "name": "Challenges",
+        "type": "Multiple Choice",
+        "text": "Challenges",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Artificial Intelligence (AI) - AI",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Simulation - Simulation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Extended Reality (XR) - ExtendedReality",
+                "showLogic": {
+                    "text": "PC: If choose XR, ask question based on AR, VR and MR",
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q1",
+        "name": "Familiar",
+        "type": "Multiple Choice",
+        "text": "How familiar are you with [Insert current iteration]",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.Q1.How familiar are you with [Insert current iteration]Select one response.DEFAULT ORDER.1.Very Familiar - VeryFamiliar2.Somewhat Familiar - SomeFamiliar3.Neutral - Neutral4.Somewhat Unfamiliar - SomeUnfamiliar5.Very Unfamiliar - VeryUnfamiliar",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q1",
+        "name": "Q1",
+        "type": "Single Choice",
+        "text": "How familiar are you with [Insert current iteration]\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Very Familiar - VeryFamiliar",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Somewhat Familiar - SomeFamiliar",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Neutral - Neutral",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Somewhat Unfamiliar - SomeUnfamiliar",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Very Unfamiliar - VeryUnfamiliar",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q2",
+        "name": "Interaction",
+        "type": "Multiple Choice",
+        "text": "Have you ever interacted with any [Insert current iteration]",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.Q2.Have you ever interacted with any [Insert current iteration]Select one response.DEFAULT ORDER.1.Yes, Frequently - YesFrequently2.Yes, Occasionally - YesOccasionally3.No, but I am interested - NoInterested4.No, and I am not interested - NoNotInterested",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q2",
+        "name": "Q2",
+        "type": "Single Choice",
+        "text": "Have you ever interacted with any [Insert current iteration]\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Yes, Frequently - YesFrequently",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Yes, Occasionally - YesOccasionally",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "No, but I am interested - NoInterested",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "No, and I am not interested - NoNotInterested",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q3",
+        "name": "PointOfView",
+        "type": "Multiple Choice",
+        "text": "How do you feel about the development and use of [Insert current iteration]",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all.Q3.How do you feel about the development and use of [Insert current iteration]Select one response.DEFAULT ORDER.1.Very Negative - VeryNegative2.Somewhat Negative - SomeNegative3.Neutral - Neutral4.Somewhat Positive - SomePositive5.Very Positive - VeryPositive",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q3",
+        "name": "Q3",
+        "type": "Single Choice",
+        "text": "How do you feel about the development and use of [Insert current iteration]\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Very Negative - VeryNegative",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Somewhat Negative - SomeNegative",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Neutral - Neutral",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Somewhat Positive - SomePositive",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Very Positive - VeryPositive",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q4",
+        "name": "TechCompany",
+        "type": "Multiple Choice",
+        "text": "Which of the following companies is involved in the development of [Insert response from S8_Aware]?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show to all. Only show column stubs selected at S8.- Programmer Comment: Add the variable name TechDevelop and add any tech from S8_Aware if company is working on itAdd QCFlag if respondent choose wrong option from property.Q4.Which of the following companies is involved in the development of [Insert response from S8_Aware]?Select all that apply for each.COLS: DEFAULT ORDER.ROWS: RANDOMIZE LIST.Artificial Intelligence (AI) - AISimulation - SimulationExtended Reality (XR) - ExtendedRealityNone - None1. Google - Google12342. Amazon - Amazon12343. Microsoft - Microsoft12344. NVIDIA - Nvidia12345. Tesla - Tesla12346. Netflix - Netflix12347. Apple - Apple12348. Oculus - Oculus12349. HTC - Htc123410. Samsung - Samsung123411. ANSYS - Ansys123412. Siemens - Siemens123413. Unity - Unity123414. SimScale - Simscale123415. Dassault Systemes - DassaultSystemes123416. COMSOL - Comsol123417. Vuzix - Vuzix1234EXCLUSIVE. ALWAYS SHOWN.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q4",
+        "name": "Q4",
+        "type": "Multi Punch",
+        "text": "Which of the following companies is involved in the development of [Insert response from S8_Aware]?\nSelect all that apply for each.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Google - Google",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Amazon - Amazon",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Microsoft - Microsoft",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "NVIDIA - Nvidia",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Tesla - Tesla",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "6",
+                "text": "Netflix - Netflix",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "7",
+                "text": "Apple - Apple",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "8",
+                "text": "Oculus - Oculus",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "9",
+                "text": "HTC - Htc",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "10",
+                "text": "Samsung - Samsung",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "11",
+                "text": "ANSYS - Ansys",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "12",
+                "text": "Siemens - Siemens",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "13",
+                "text": "Unity - Unity",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "14",
+                "text": "SimScale - Simscale",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "15",
+                "text": "Dassault Systemes - DassaultSystemes",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "16",
+                "text": "COMSOL - Comsol",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "17",
+                "text": "Vuzix - Vuzix",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q5",
+        "name": "Challenge",
+        "type": "Multiple Choice",
+        "text": "What are the challenges faced in the development and adoption of these technologies?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if Limit the respondent to choose atmost 3 options. Only show row stubs selected at S8.- Programmer Comment: Do not use Mobile-First presentation in PC VersionQ5.What are the challenges faced in the development and adoption of these technologies?Select max 3 optionsCOLS: RANDOMIZE LIST.ROWS: DEFAULT ORDER.Technical limitations and complexity - LimitationsCost and investment - CostInvestmentLack of skilled workforce - LackSkilledWorkforceLack of standardization and interoperability - LackStandardizationEthical and societal concerns - EthicalSocietalHealth and safety concerns - HealthSafetyThere will be no challenges - None1. Artificial Intelligence (AI) - AI12345672. Simulation - Simulation12345673. Extended Reality (XR) - ExtendedReality1234567PC: If choose XR, ask question based on AR, VR and MRANCHOR. EXCLUSIVE.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q5",
+        "name": "Q5",
+        "type": "Multi Punch",
+        "text": "What are the challenges faced in the development and adoption of these technologies?\nSelect max 3 options",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Artificial Intelligence (AI) - AI",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Simulation - Simulation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Extended Reality (XR) - ExtendedReality",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q6",
+        "name": "AIBenefits",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential benefits of AI do you find most compelling?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.Q6.Which of the following potential benefits of AI do you find most compelling?Select one response.RANDOMIZE LIST.1.Improved efficiency and productivity - ImprovedEfficiency2.More accurate decision-making - MoreAccurateDecision3.Greater convenience - GreaterConvenience4.Improved healthcare outcomes - ImprovedHealthcare5.Other (please specify) - Others__________ANCHOR. EXCLUSIVE.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q6",
+        "name": "Q6",
+        "type": "Single Choice",
+        "text": "Which of the following potential benefits of AI do you find most compelling?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Improved efficiency and productivity - ImprovedEfficiency",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "More accurate decision-making - MoreAccurateDecision",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Greater convenience - GreaterConvenience",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Improved healthcare outcomes - ImprovedHealthcare",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Other (please specify) - Others__________",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q7",
+        "name": "AIDrawbacks",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential drawbacks of AI do you find most concerning?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.Q7.Which of the following potential drawbacks of AI do you find most concerning?Select one response.RANDOMIZE LIST.1.Job loss and employment displacement - JobLoss2.Bias and discrimination - BiasDiscrimination3.Privacy and security concerns - PrivacySecurity4.Lack of transparency and accountability - LackTransparency5.Other (please specify) - Others__________ANCHOR. EXCLUSIVE.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q7",
+        "name": "Q7",
+        "type": "Single Choice",
+        "text": "Which of the following potential drawbacks of AI do you find most concerning?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Job loss and employment displacement - JobLoss",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Bias and discrimination - BiasDiscrimination",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Privacy and security concerns - PrivacySecurity",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Lack of transparency and accountability - LackTransparency",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "5",
+                "text": "Other (please specify) - Others__________",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "Q8",
+        "name": "AIProblemSolving",
+        "type": "Multiple Choice",
+        "text": "How do you think AI can help solve some of the world's biggest problems?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.- Show if Limit the respondent to choose atmost 3 options.Q8.How do you think AI can help solve some of the world's biggest problems?Select all that apply.RANDOMIZE LIST.1.Climate change adaptation - ClimateChange2.Healthcare access and affordability - HealthcareAccess3.Poverty and social inequality - PovertySocialInequal4.Disaster response and management - DisasterResponse5.Other (Please Specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q8",
+        "name": "Q8",
+        "type": "Multi Punch",
+        "text": "How do you think AI can help solve some of the world's biggest problems?\nSelect all that apply.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Climate change adaptation - ClimateChange",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Healthcare access and affordability - HealthcareAccess",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Poverty and social inequality - PovertySocialInequal",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Disaster response and management - DisasterResponse",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q9",
+        "name": "AIIndustryBenefit",
+        "type": "Multiple Choice",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of AI?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.- Show if Limit the respondent to choose atmost 3 options.Q9.Which of the following industries do you think will benefit the most from the adoption of AI?Select max 3 optionsRANDOMIZE LIST.1.Healthcare - Healthcare2.Finance - Finance3.Manufacturing - Manufacturing4.Transportation - Transportation5.Other (Please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q9",
+        "name": "Q9",
+        "type": "Multi Punch",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of AI?\nSelect max 3 options",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Healthcare - Healthcare",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Finance - Finance",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Manufacturing - Manufacturing",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Transportation - Transportation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q10",
+        "name": "AIPromising",
+        "type": "Multiple Choice",
+        "text": "Which of the following AI applications do you find most promising?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [AI] at S8.Q10.Which of the following AI applications do you find most promising?Select one response.RANDOMIZE LIST.1.Autonomous vehicles - AutonomousVehicles2.Healthcare diagnosis and treatment - HealthcareDiagnosis3.Personalized advertising and recommendations - Personalized4.Fraud detection and prevention - FraudDetection5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q10",
+        "name": "Q10",
+        "type": "Single Choice",
+        "text": "Which of the following AI applications do you find most promising?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Autonomous vehicles - AutonomousVehicles",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Healthcare diagnosis and treatment - HealthcareDiagnosis",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Personalized advertising and recommendations - Personalized",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Fraud detection and prevention - FraudDetection",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q11",
+        "name": "XRDevicePurchase",
+        "type": "Multiple Choice",
+        "text": "Which of the following XR devices do you own or would consider purchasing?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q11.Which of the following XR devices do you own or would consider purchasing?Select all that apply.RANDOMIZE LIST.1.Virtual Reality (VR) headset - VirtualRealityVr2.Augmented Reality (AR) glasses - AugmentedRealityAr3.Mixed Reality (MR) headset - MixedRealityMr4.None - NoneANCHOR. EXCLUSIVE. 5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q11",
+        "name": "Q11",
+        "type": "Multi Punch",
+        "text": "Which of the following XR devices do you own or would consider purchasing?\nSelect all that apply.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Virtual Reality (VR) headset - VirtualRealityVr",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Augmented Reality (AR) glasses - AugmentedRealityAr",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Mixed Reality (MR) headset - MixedRealityMr",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "None - None",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q12",
+        "name": "XRAppsInterested",
+        "type": "Multiple Choice",
+        "text": "What types of XR applications are you most interested in?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q12.What types of XR applications are you most interested in?Select one response.RANDOMIZE LIST.1.Gaming and entertainment - GamingEntertainment2.Training and education - TrainingEducation3.Industrial design and engineering - IndustrialDesignEng4.Healthcare and wellness - HealthcareWellness5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q12",
+        "name": "Q12",
+        "type": "Single Choice",
+        "text": "What types of XR applications are you most interested in?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Gaming and entertainment - GamingEntertainment",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Training and education - TrainingEducation",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Industrial design and engineering - IndustrialDesignEng",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Healthcare and wellness - HealthcareWellness",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q13",
+        "name": "XRBenefit",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential benefits of [Insert response from Q11_XRDevicePurchase] do you find most compelling?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q13.Which of the following potential benefits of [Insert response from Q11_XRDevicePurchase] do you find most compelling?Select one response.RANDOMIZE LIST.1.Improved training and education - ImprovedTraining2.Enhanced entertainment and gaming - EnhancedEntertainmen3.Improved customer experiences - ImprovedCustomer4.Enhanced design and prototyping - EnhancedDesign5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q13",
+        "name": "Q13",
+        "type": "Single Choice",
+        "text": "Which of the following potential benefits of [Insert response from Q11_XRDevicePurchase] do you find most compelling?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Improved training and education - ImprovedTraining",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Enhanced entertainment and gaming - EnhancedEntertainmen",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Improved customer experiences - ImprovedCustomer",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Enhanced design and prototyping - EnhancedDesign",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q14",
+        "name": "XRDrawback",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential drawbacks of [Insert response from Q11_XRDevicePurchase] do you find most concerning?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q14.Which of the following potential drawbacks of [Insert response from Q11_XRDevicePurchase] do you find most concerning?Select one response.DEFAULT ORDER.1.Cost and accessibility - CostAccessibility2.Health and safety concerns - HealthSafety3.Privacy and security concerns - PrivacySecurity4.Addiction and over-reliance - AddictionOverrelianc5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q14",
+        "name": "Q14",
+        "type": "Single Choice",
+        "text": "Which of the following potential drawbacks of [Insert response from Q11_XRDevicePurchase] do you find most concerning?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Cost and accessibility - CostAccessibility",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Health and safety concerns - HealthSafety",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Privacy and security concerns - PrivacySecurity",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Addiction and over-reliance - AddictionOverrelianc",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q15",
+        "name": "XRWorkTransform",
+        "type": "Multiple Choice",
+        "text": "In what ways do you believe [Insert response from Q11_XRDevicePurchase] could transform the future of work?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q15.In what ways do you believe [Insert response from Q11_XRDevicePurchase] could transform the future of work?Select all that apply.RANDOMIZE LIST.1.Improved training and education - ImprovedTraining2.Enhanced collaboration and communication - EnhancedCollaboratio3.More efficient and effective processes - MoreEfficient4.New business opportunities and revenue streams - NewBusinessOpportuni5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q15",
+        "name": "Q15",
+        "type": "Multi Punch",
+        "text": "In what ways do you believe [Insert response from Q11_XRDevicePurchase] could transform the future of work?\nSelect all that apply.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Improved training and education - ImprovedTraining",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Enhanced collaboration and communication - EnhancedCollaboratio",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "More efficient and effective processes - MoreEfficient",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "New business opportunities and revenue streams - NewBusinessOpportuni",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q16",
+        "name": "XRIndustryBenefit",
+        "type": "Multiple Choice",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of [Insert response from Q11_XRDevicePurchase]?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q16.Which of the following industries do you think will benefit the most from the adoption of [Insert response from Q11_XRDevicePurchase]?Select any 3 options or lessRANDOMIZE LIST.1.Healthcare - Healthcare2.Education and training - EducationTraining3.Entertainment and gaming - EntertainmentGaming4.Architecture and construction - ArchitectureConstruc5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q16",
+        "name": "Q16",
+        "type": "Multiple Choice",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of [Insert response from Q11_XRDevicePurchase]?\nSelect any 3 options or less",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Healthcare - Healthcare",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Education and training - EducationTraining",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Entertainment and gaming - EntertainmentGaming",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Architecture and construction - ArchitectureConstruc",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q17",
+        "name": "XRPromising",
+        "type": "Multiple Choice",
+        "text": "Which of the following [Insert response from Q11_XRDevicePurchase] applications do you find most promising?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [ExtendedReality] at S8.Q17.Which of the following [Insert response from Q11_XRDevicePurchase] applications do you find most promising?Select one response.RANDOMIZE LIST.1.Virtual meetings and remote collaboration - VirtualMeetingsRemot2.Immersive education and training - ImmersiveEducationTr3.Interactive entertainment and gaming - InteractiveEntertain4.Enhanced retail and e-commerce experiences - EnhancedRetailEcomme5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q17",
+        "name": "Q17",
+        "type": "Single Choice",
+        "text": "Which of the following [Insert response from Q11_XRDevicePurchase] applications do you find most promising?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Virtual meetings and remote collaboration - VirtualMeetingsRemot",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Immersive education and training - ImmersiveEducationTr",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Interactive entertainment and gaming - InteractiveEntertain",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Enhanced retail and e-commerce experiences - EnhancedRetailEcomme",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q18",
+        "name": "SimBenefits",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential benefits of simulations do you find most compelling?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.Q18.Which of the following potential benefits of simulations do you find most compelling?Select one response.RANDOMIZE LIST.1.Improved training and education - ImprovedTraining2.Enhanced decision-making - EnhancedDecision3.Reduced risk and cost - ReducedRiskCost4.Enhanced experimentation and testing - EnhancedExperiment5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q18",
+        "name": "Q18",
+        "type": "Single Choice",
+        "text": "Which of the following potential benefits of simulations do you find most compelling?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Improved training and education - ImprovedTraining",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Enhanced decision-making - EnhancedDecision",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Reduced risk and cost - ReducedRiskCost",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Enhanced experimentation and testing - EnhancedExperiment",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q19",
+        "name": "SimDrawback",
+        "type": "Multiple Choice",
+        "text": "Which of the following potential drawbacks of simulations do you find most concerning?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.Q19.Which of the following potential drawbacks of simulations do you find most concerning?Select one response.RANDOMIZE LIST.1.Lack of realism and accuracy - LackRealismAccuracy2.Over-reliance on simulations - Overreliance3.Technical limitations and complexity - Limitations4.Ethical and moral concerns - EthicalMoralConcerns5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q19",
+        "name": "Q19",
+        "type": "Single Choice",
+        "text": "Which of the following potential drawbacks of simulations do you find most concerning?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Lack of realism and accuracy - LackRealismAccuracy",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Over-reliance on simulations - Overreliance",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Technical limitations and complexity - Limitations",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Ethical and moral concerns - EthicalMoralConcerns",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q20",
+        "name": "SimWorkTransform",
+        "type": "Multiple Choice",
+        "text": "In what ways do you believe simulations could transform the future of work?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.- Show if Limit the respondent to choose atmost 3 options.Q20.In what ways do you believe simulations could transform the future of work?Select max 3 optionsRANDOMIZE LIST.1.Improved training and education - ImprovedTraining2.More efficient and effective processes - MoreEfficient3.Enhanced decision-making - EnhancedDecision4.Reduced risk and cost - ReducedRiskCost5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q20",
+        "name": "Q20",
+        "type": "Multi Punch",
+        "text": "In what ways do you believe simulations could transform the future of work?\nSelect max 3 options",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Improved training and education - ImprovedTraining",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "More efficient and effective processes - MoreEfficient",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Enhanced decision-making - EnhancedDecision",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Reduced risk and cost - ReducedRiskCost",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q21",
+        "name": "SimIndustryBenefit",
+        "type": "Multiple Choice",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of simulations?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.- Show if Limit the respondent to choose atmost 3 options.Q21.Which of the following industries do you think will benefit the most from the adoption of simulations?Select max 3 options.RANDOMIZE LIST.1.Healthcare - Healthcare2.Aerospace and defense - AerospaceDefense3.Manufacturing - Manufacturing4.Energy and utilities - EnergyUtilities5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q21",
+        "name": "Q21",
+        "type": "Multi Punch",
+        "text": "Which of the following industries do you think will benefit the most from the adoption of simulations?\nSelect max 3 options.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Healthcare - Healthcare",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Aerospace and defense - AerospaceDefense",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Manufacturing - Manufacturing",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Energy and utilities - EnergyUtilities",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q22",
+        "name": "SimPromising",
+        "type": "Multiple Choice",
+        "text": "Which of the following simulation applications do you find most promising?",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": "Show if respondent selected code [Simulation] at S8.Q22.Which of the following simulation applications do you find most promising?Select one response.RANDOMIZE LIST.1.Virtual training and education - VirtualTrainingEduca2.Risk analysis and management - RiskAnalysisManageme3.Product design and development - ProductDesignDevelop4.Predictive modeling and forecasting - PredictiveModelingFo5.Other (please specify) - Others__________ANCHOR.",
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    },
+    {
+        "id": "Q22",
+        "name": "Q22",
+        "type": "Single Choice",
+        "text": "Which of the following simulation applications do you find most promising?\nSelect one response.",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": [
+            {
+                "id": "1",
+                "text": "Virtual training and education - VirtualTrainingEduca",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "2",
+                "text": "Risk analysis and management - RiskAnalysisManageme",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "3",
+                "text": "Product design and development - ProductDesignDevelop",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            },
+            {
+                "id": "4",
+                "text": "Predictive modeling and forecasting - PredictiveModelingFo",
+                "showLogic": {
+                    "text": null,
+                    "condition": null
+                },
+                "terminateLogic": {
+                    "text": null,
+                    "condition": null
+                }
+            }
+        ]
+    },
+    {
+        "id": "ANCHOR",
+        "name": "ANCHOR",
+        "type": "Multiple Choice",
+        "text": "\nFlag Type Apply To Rule Points\nTimer Screener 0 Minutes 1\nTimer Main + Screener 0 Minutes 1\nLogical Question - Q8_AIProblemSolving respondent selected code [PovertySocialInequal] at Q8_AIProblemSolving. 1\nDescription Built Logic\nLimit the respondent to choose atmost 3 options Limit the respondent to choose atmost 3 options\nShow if Selected topic selected in previous question. respondent selected code [ExtendedReality] at S8_Aware",
+        "parentBlocks": [],
+        "showLogic": {
+            "text": null,
+            "condition": null
+        },
+        "terminateLogic": {
+            "text": null,
+            "condition": null
+        },
+        "options": []
+    }
+]

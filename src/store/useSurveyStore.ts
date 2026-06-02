@@ -6,6 +6,7 @@ import {
   QuestionLogic,
   LoopBlock,
   SurveyBlock,
+  ConvertedQuestion,
 } from "../types/logic";
 import {
   buildGraphLevelLayout,
@@ -21,6 +22,7 @@ import { parseSurveyData } from "../engine/surveyParser";
 interface SurveyStore {
   data: any[];
   refinedQuestions: Question[];
+  convertedQuestions: ConvertedQuestion[]; // From document uploads
   logicMap: Record<string, QuestionLogic>;
   loopBlocks: LoopBlock[];
   nodes: Node[];
@@ -31,6 +33,7 @@ interface SurveyStore {
   setView: (view: "editor" | "map") => void;
 
   setSurveyData: (data: any[]) => void;
+  setConvertedQuestions: (questions: ConvertedQuestion[]) => void; // For document uploads
   updateLogic: (id: string, logic: Partial<QuestionLogic>) => void;
   getFlowElements: () => void;
 
@@ -45,6 +48,7 @@ export const useSurveyStore = create<SurveyStore>()(
   devtools((set, get) => ({
     data: [],
     refinedQuestions: [],
+    convertedQuestions: [],
     logicMap: {},
     loopBlocks: [],
     nodes: [],
@@ -72,6 +76,13 @@ export const useSurveyStore = create<SurveyStore>()(
       });
 
       get().getFlowElements();
+    },
+
+    setConvertedQuestions: (questions) => {
+      set({
+        convertedQuestions: questions,
+        currentView: "editor", // Switch to editor view when converted data is loaded
+      });
     },
 
     updateLogic: (id, logic) => {
