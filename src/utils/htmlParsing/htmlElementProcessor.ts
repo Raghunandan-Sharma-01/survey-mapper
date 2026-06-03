@@ -71,10 +71,26 @@ export function isOptionMarker(cell: string): boolean {
 export function looksLikeQuestionText(text: string): boolean {
   const trimmed = text.trim();
   if (!trimmed) return false;
+
+  // 1. Definite question markers
   if (/\?/.test(trimmed)) return true;
 
-  const questionWords = /\b(what|which|when|where|why|how|is|are|do|does|did|will|can|could|would|should)\b/i;
-  return questionWords.test(trimmed) && trimmed.split(/\s+/).length >= 4;
+  // 2. Starts with a question word (Removed the >= 4 words limit to catch short questions)
+  const questionWords = /^(what|which|when|where|why|how|is|are|do|does|did|will|can|could|would|should|please)\b/i;
+  if (questionWords.test(trimmed)) return true;
+
+  // 3. Catch instructional text that often accompanies questions
+  const instructionalWords = /^(select|enter|choose|click|type|provide|rank|rate|evaluate|specify)\b/i;
+  if (instructionalWords.test(trimmed)) return true;
+
+  // 4. Catch short noun phrases typically used as demographic headers
+  const demographicHeaders = /^(gender|age|zip code|email|name|profession|income|challenges|assigner)$/i;
+  if (demographicHeaders.test(trimmed)) return true;
+
+  // 5. Broad sentence check (Options are usually short; descriptions/rules are long)
+  if (trimmed.split(/\s+/).length >= 8) return true;
+
+  return false;
 }
 
 /**

@@ -21,6 +21,19 @@ export function processOptionRow(
   const rowText = row.filter((c) => c !== "").join(" ");
   if (!rowText) return;
 
+  // --- THE LOOKBACK CATCH ---
+  // If this row is JUST an exclusive/anchor modifier, apply it to the previous option
+  const upperRowText = rowText.toUpperCase();
+  if (/^(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?$/.test(upperRowText)) {
+    const lastOption = currentQuestion.options[currentQuestion.options.length - 1];
+    if (lastOption) {
+      if (upperRowText.includes("EXCLUSIVE")) lastOption.isExclusive = true;
+      if (upperRowText.includes("ANCHOR")) lastOption.isAnchor = true;
+      if (upperRowText.includes("ALWAYS SHOWN")) lastOption.isAlwaysShown = true;
+    }
+    return; // Exit early, we handled it!
+  }
+
   // Ignore metadata rows
   if (isMetadataRow(rowText)) return;
 
@@ -61,8 +74,14 @@ function parseOptionMultiColumn(
     optShow = optLogic;
   if (optLogic.toLowerCase().includes("terminate")) optTerm = optLogic;
 
+  const rawText = row.join(" "); // Search the whole row for flags
+
+  const isExclusive = /EXCLUSIVE/i.test(rawText);
+  const isAnchor = /ANCHOR/i.test(rawText);
+  const isAlwaysShown = /ALWAYS SHOWN/i.test(rawText);
+
   const cleanOptText = row[codeIndex + 1]
-    .replace(/(EXCLUSIVE|ANCHOR)\.?$/i, "")
+    .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
     .trim();
 
   if (looksLikeQuestionText(cleanOptText)) {
@@ -73,6 +92,9 @@ function parseOptionMultiColumn(
   currentQuestion.options.push({
     id: row[codeIndex].replace(/[.:]$/, ""),
     text: cleanOptText,
+    isExclusive,
+    isAnchor,
+    isAlwaysShown,
     showLogic: { text: optShow, condition: null },
     terminateLogic: { text: optTerm, condition: null },
   });
@@ -90,8 +112,16 @@ function parseOptionCombined(
 
   const match = firstCell.match(/^([0-9]+|[a-zA-Z])[.)\]]\s*(.+)$/);
   if (match) {
-    const cleanOptText = match[2]
-      .replace(/(EXCLUSIVE|ANCHOR)\.?$/i, "")
+    const rawText = match[2];
+    
+    // 1. Detect the flags
+    const isExclusive = /EXCLUSIVE/i.test(rawText);
+    const isAnchor = /ANCHOR/i.test(rawText);
+    const isAlwaysShown = /ALWAYS SHOWN/i.test(rawText);
+
+    // 2. Clean the text
+    const cleanOptText = rawText
+      .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
       .trim();
 
     if (looksLikeQuestionText(cleanOptText)) {
@@ -99,9 +129,13 @@ function parseOptionCombined(
       return;
     }
 
+    // 3. Push the new object
     currentQuestion.options.push({
       id: match[1],
       text: cleanOptText,
+      isExclusive,
+      isAnchor,
+      isAlwaysShown,
       showLogic: { text: null, condition: null },
       terminateLogic: { text: null, condition: null },
     });

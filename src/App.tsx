@@ -43,6 +43,7 @@ export default function App() {
         }
       },
       onDocxConverted: (questions) => {
+        console.log("Raw parsed questions:", questions);
         setConvertedQuestions(questions);
       },
       onError: setError,

@@ -6,6 +6,7 @@
 import { ConvertedQuestion } from "../../types/logic";
 import { stripInstructionsFromText, getInstructionsToStrip } from "./instructionStripper";
 import { cleanSquashedLogicText, extractMissingOptionsFromSquashedLogic } from "../htmlParsing/logicExtractor";
+import { looksLikeQuestionText } from "../htmlParsing/htmlElementProcessor";
 
 /**
  * Merges questions with duplicate IDs
@@ -53,10 +54,26 @@ export function cleanSquashedLogic(q: ConvertedQuestion): void {
     // Rescue options missing from the table due to squashing
     const missingOptions = extractMissingOptionsFromSquashedLogic(squashedText);
     missingOptions.forEach(({ id, text }) => {
-      if (!q.options.some((o) => o.id === id)) {
+      const rawText = text.trim();
+      
+      // 1. Detect the flags
+      const isExclusive = /EXCLUSIVE/i.test(rawText);
+      const isAnchor = /ANCHOR/i.test(rawText);
+      const isAlwaysShown = /ALWAYS SHOWN/i.test(rawText);
+
+      // 2. Clean the text
+      const cleanOptText = rawText
+        .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
+        .trim();
+
+      // 3. Apply the safeguard and push!
+      if (!looksLikeQuestionText(cleanOptText) && !q.options.some((o) => o.id === id)) {
         q.options.push({
           id,
-          text,
+          text: cleanOptText,
+          isExclusive,
+          isAnchor,
+          isAlwaysShown,
           showLogic: { text: null, condition: null },
           terminateLogic: { text: null, condition: null },
         });

@@ -26,19 +26,27 @@ export function processParagraphElement(
   const parts = tokenizeText(text);
 
   for (let part of parts) {
-    // Break if we hit a Question ID (logic squashing detected)
     if (isQuestionIdPart(part)) {
       break;
     }
 
-    let cleanPart = part.replace(/^-\s*/, "");
+    let cleanPart = part.replace(/^-\s*/, "").trim();
     const lower = cleanPart.toLowerCase();
 
     if (lower.startsWith("show ") || lower.startsWith("if ")) {
-      state.pendingShow = (state.pendingShow ? state.pendingShow + " " : "") + cleanPart;
+      state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
     } else if (lower.startsWith("terminate ") || lower.startsWith("delay ")) {
-      state.pendingTerminate =
-        (state.pendingTerminate ? state.pendingTerminate + " " : "") + cleanPart;
+      state.pendingTerminate = (state.pendingTerminate ? state.pendingTerminate + "\n" : "") + cleanPart;
+      
+    // FIX: Catch modifiers, masking logic, and comments so they aren't thrown away!
+    } else if (
+      lower.startsWith("programmer comment") ||
+      lower.includes("qcflag") ||
+      lower.startsWith("only show") ||
+      lower.startsWith("hide")
+    ) {
+      // Append these as secondary instructions to the show logic string
+      state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
     }
   }
 }
@@ -73,9 +81,17 @@ export function cleanSquashedLogicText(
   let terminateLogic: string | null = null;
 
   if (squashedText.toLowerCase().includes("show")) {
-    const showRegex = new RegExp(`(Show.*?)(?=-\\s*Terminate|${questionId}\\.)`, "i");
+    const showRegex = new RegExp(`(Show.*?)(?=-\\s*Terminate|${questionId}\\.|$)`, "i");
     const showMatch = squashedText.match(showRegex);
-    showLogic = showMatch ? showMatch[1].replace(/^-\s*/, "").trim() : null;
+    if (showMatch) {
+      let sText = showMatch[1].replace(/^-\s*/, "").trim();
+      
+      // FIX: Check if the ID was chopped off by using a whitespace-friendly regex
+      const regexCheck = new RegExp(sText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+' + questionId, 'i');
+      if (regexCheck.test(squashedText)) sText += " " + questionId;
+      
+      showLogic = sText;
+    }
   }
 
   if (squashedText.toLowerCase().includes("terminate")) {
@@ -83,7 +99,11 @@ export function cleanSquashedLogicText(
     const termMatch = squashedText.match(termRegex);
     if (termMatch) {
       let tText = termMatch[1].replace(/^-\s*/, "").trim();
-      if (squashedText.includes(tText + questionId)) tText += " " + questionId;
+      
+      // FIX: tText was trimmed, dropping the space. Use Regex to safely re-attach.
+      const regexCheck = new RegExp(tText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+' + questionId, 'i');
+      if (regexCheck.test(squashedText)) tText += " " + questionId;
+      
       terminateLogic = tText;
     }
   }

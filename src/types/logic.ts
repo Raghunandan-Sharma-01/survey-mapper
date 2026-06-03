@@ -123,8 +123,11 @@ export interface LogicTextRepresentation {
  * Option/Stub in a converted question (from document upload)
  */
 export interface ConvertedOption {
-  id: string; // Response code, e.g., "1", "3", "4"
+  id: string; 
   text: string;
+  isExclusive: boolean;
+  isAnchor: boolean;
+  isAlwaysShown: boolean;
   showLogic: LogicTextRepresentation;
   terminateLogic: LogicTextRepresentation;
 }

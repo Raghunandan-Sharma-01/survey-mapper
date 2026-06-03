@@ -13,9 +13,21 @@ import {
  * Detects the column index of question ID in table row
  */
 export function detectQuestionIdIndex(row: string[]): number {
-  const explicitIdIndex = row.findIndex(
-    (c) => c.match(/^[A-Za-z_]+[A-Za-z0-9_]*\.$/) && !c.match(/^\d+\.$/),
-  );
+  const explicitIdIndex = row.findIndex((c) => {
+    const trimmed = c.trim();
+    
+    // 1. Must match the Question ID pattern (Letters/Underscores ending in a dot)
+    if (!trimmed.match(/^[A-Za-z_]+[A-Za-z0-9_]*\.$/)) return false;
+    
+    // 2. Must not be purely numeric
+    if (trimmed.match(/^\d+\.$/)) return false;
+    
+    // 3. THE FIX: Ignore metadata keywords that accidentally match the ID pattern
+    if (/^(EXCLUSIVE|ANCHOR|RANDOMIZE|DEFAULT)\.?$/i.test(trimmed)) return false;
+    
+    return true;
+  });
+
   if (explicitIdIndex !== -1) return explicitIdIndex;
 
   const numericIndex = row.findIndex((c) => c.match(/^\d+\.$/));
