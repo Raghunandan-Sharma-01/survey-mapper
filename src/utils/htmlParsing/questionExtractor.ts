@@ -46,7 +46,7 @@ export function createNewQuestion(
   idIndex: number,
   state: ParsingState,
 ): ConvertedQuestion {
-  const qId = row[idIndex].replace(".", "");
+  let qId = row[idIndex].replace(".", "");
   const qText = row[idIndex + 1] || "";
 
   let inlineName = state.pendingName;
@@ -66,10 +66,15 @@ export function createNewQuestion(
     }
   }
 
+  // FIX: Make Display Text IDs unique so they don't get merged!
+  if (qId === "DT" && inlineName) {
+    qId = `DT_${inlineName.replace(/[^A-Za-z0-9]/g, "")}`;
+  }
+
   return {
     id: qId,
     name: inlineName || qId,
-    type: "Multiple Choice",
+    type: "Multiple Choice", // We should ideally set this to "Display Text"
     text: qText,
     parentBlocks: [],
     showLogic: { text: inlineShow || null, condition: null },

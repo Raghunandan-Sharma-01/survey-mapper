@@ -87,10 +87,16 @@ export function extractPathsUsingDFS(
  * Used for analyzing survey flow and logic paths
  */
 export function calculateAllPaths(nodes: Node[], edges: Edge[]): string[][] {
-  const { adjacencyList, inDegreeTracker } = buildPathAdjacencyList(
-    nodes,
-    edges
-  );
+  const { adjacencyList, inDegreeTracker } = buildPathAdjacencyList(nodes, edges);
   const rootNodes = findPathRoots(adjacencyList, inDegreeTracker);
-  return extractPathsUsingDFS(rootNodes, adjacencyList);
+  const rawPaths = extractPathsUsingDFS(rootNodes, adjacencyList);
+
+  // THE FIX: Deduplicate the paths by joining them into strings,
+  // storing them in a Map, and extracting the unique arrays.
+  const uniquePathsMap = new Map<string, string[]>();
+  rawPaths.forEach(path => {
+    uniquePathsMap.set(path.join('|'), path);
+  });
+
+  return Array.from(uniquePathsMap.values());
 }

@@ -42,10 +42,7 @@ export default function App() {
           setSurveyData(payload);
         }
       },
-      onDocxConverted: (questions) => {
-        console.log("Raw parsed questions:", questions);
-        setConvertedQuestions(questions);
-      },
+      onDocxConverted: (questions) => setConvertedQuestions(questions),
       onError: setError,
       onLoadingChange: setIsLoading,
     };

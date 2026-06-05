@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -11,12 +12,12 @@ import { useSurveyStore } from "../../store/useSurveyStore";
 import QuestionNode from "./QuestionNode";
 import PathSelector from "./PathSelector";
 
-const nodeTypes = {
-  questionNode: QuestionNode,
-};
-
 const LogicMap = () => {
   const { nodes, edges } = useSurveyStore();
+
+  // 1. THE FIX: Memoize nodeTypes and edgeOptions
+  const nodeTypes = useMemo(() => ({ questionNode: QuestionNode }), []);
+  const defaultEdgeOptions = useMemo(() => ({ type: "smoothstep" }), []);
 
   return (
     <div className="grow h-full bg-gray-50">
@@ -27,9 +28,7 @@ const LogicMap = () => {
         fitView
         minZoom={0.2}
         maxZoom={1.5}
-        defaultEdgeOptions={{
-          type: "smoothstep",
-        }}
+        defaultEdgeOptions={defaultEdgeOptions}
         proOptions={{ hideAttribution: true }}
       >
         <Panel position="top-left" className="m-4">

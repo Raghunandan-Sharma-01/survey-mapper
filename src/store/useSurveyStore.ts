@@ -18,6 +18,7 @@ import {
   resolveEffectiveLogic,
 } from "../utils/logicHelpers";
 import { parseSurveyData } from "../engine/surveyParser";
+import { parseTextToLogicNode } from "../utils/htmlParsing/logicParser";
 
 interface SurveyStore {
   data: any[];
@@ -60,7 +61,13 @@ export const useSurveyStore = create<SurveyStore>()(
     currentView: "editor",
 
     // 3. ADD THE FUNCTION IMPLEMENTATION
-    setView: (view) => set({ currentView: view }),
+    setView: (view) => {
+      set({ currentView: view });
+      // FIX: Force the graph to calculate when we switch to the map view!
+      if (view === "map") {
+        get().getFlowElements();
+      }
+    },
 
     setSurveyData: (rawData) => {
       // Use the new parser!
@@ -83,6 +90,8 @@ export const useSurveyStore = create<SurveyStore>()(
         convertedQuestions: questions,
         currentView: "editor", // Switch to editor view when converted data is loaded
       });
+      // FIX: Calculate the initial graph elements in the background
+      get().getFlowElements(); 
     },
 
     updateLogic: (id, logic) => {
@@ -136,22 +145,55 @@ export const useSurveyStore = create<SurveyStore>()(
       });
     },
     getFlowElements: () => {
-      const { refinedQuestions, logicMap, blocks } = get();
-      if (refinedQuestions.length === 0) return;
+      const { refinedQuestions, convertedQuestions, logicMap, blocks } = get();
+      
+      // 1. THE BRIDGE: Use refined if available, otherwise fallback to converted DOCX data
+      const sourceQuestions = refinedQuestions.length > 0 ? refinedQuestions : convertedQuestions;
 
+      if (sourceQuestions.length === 0) {
+        console.warn("Graph generation aborted: No questions available.");
+        return;
+      }
+
+      // 2. ADAPT: Map ConvertedQuestions to look like standard Questions for the layout engine
+      const mappedQuestions = sourceQuestions.map((q: any) => ({
+        id: q.id as unknown as number, // Override type mismatch (string vs number)
+        uniqueKey: q.id.toString(),
+        name: q.name || q.id,
+        fullName: q.text || q.name, 
+        text: q.text || null, // FIX: Added missing required property
+        type: q.type,
+        parentBlocks: q.parentBlocks || [],
+        sectionName: q.parentBlocks?.[0] || "", 
+        rows: [],
+        columns: [],
+        listOrder: 0
+      })) as unknown as Question[]; // Double cast to ensure TS accepts the bridge
+
+      // 3. Resolve Logic Map
       const resolvedLogicMap: Record<string, QuestionLogic> = {};
-      refinedQuestions.forEach((question) => {
-        resolvedLogicMap[question.id] = resolveEffectiveLogic(
-          question.id.toString(),
-          refinedQuestions,
-          blocks,
-          logicMap
-        );
+      mappedQuestions.forEach((question) => {
+        const convertedQ = convertedQuestions.find(c => c.id.toString() === question.id.toString());
+        
+        if (convertedQ && (convertedQ.showLogic?.text || convertedQ.terminateLogic?.text)) {
+           // THE MAGIC HAPPENS HERE: Translate the text to AST!
+           resolvedLogicMap[question.id.toString()] = {
+              show: parseTextToLogicNode(convertedQ.showLogic.text),
+              terminate: parseTextToLogicNode(convertedQ.terminateLogic.text),
+           };
+        } else {
+           resolvedLogicMap[question.id.toString()] = resolveEffectiveLogic(
+             question.id.toString(),
+             mappedQuestions,
+             blocks,
+             logicMap
+           );
+        }
       });
-
-      // Passing `blocks` as the 3rd argument, not loopBlocks!
+      
+      // 4. Generate Graph using Dagre Layout Engine
       const { nodes, edges } = buildGraphLevelLayout(
-        refinedQuestions,
+        mappedQuestions,
         resolvedLogicMap,
         blocks,
         readableCondition

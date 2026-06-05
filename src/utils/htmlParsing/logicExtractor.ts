@@ -19,6 +19,9 @@ export function processParagraphElement(
   const nameMatch = text.match(/\[([^\]]+)\]/);
   if (nameMatch) {
     state.pendingName = nameMatch[1];
+    state.pendingShow = ""; 
+    state.pendingTerminate = "";
+    
     text = text.replace(nameMatch[0], "").trim();
   }
 

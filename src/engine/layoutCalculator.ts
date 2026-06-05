@@ -1,315 +1,257 @@
 import { Node, Edge } from "reactflow";
-import {
-  Question,
-  QuestionLogic,
-  SurveyBlock,
-  LogicNode,
-} from "../types/logic";
-import { extractAllParentIds } from "./dependencyAnalyzer";
+import dagre from "dagre";
+import { Question, QuestionLogic, SurveyBlock, LogicNode } from "../types/logic";
 
-interface LayoutConfig {
-  maxNodesPerLevel: number;
-  horizontalSpacing: number;
-  verticalBranchSpacing: number;
-  verticalRowSpacing: number;
+const NODE_WIDTH = 250;
+const NODE_HEIGHT = 120;
+
+export function extractAllParentIds(
+  node: LogicNode | null | undefined,
+  ids = new Set<string>()
+): string[] {
+  if (!node) return [];
+  if (node.type === "leaf" && node.questionId) {
+    ids.add(node.questionId.toString());
+  } else if (node.type === "branch" && node.children) {
+    node.children.forEach((child) => extractAllParentIds(child, ids));
+  }
+  return Array.from(ids);
 }
 
-/**
- * Calculates node positions and generates connecting edges based on layout rules
- */
-export function calculatePositionsAndBaseEdges(
+export function getLayoutedGraph(
   refinedQuestions: Question[],
-  branchChildrenMap: Record<string, string[]>,
-  branchChildSet: Set<string>,
-  config: LayoutConfig
-) {
-  const calculatedPositions: Record<string, { x: number; y: number }> = {};
-  const generatedEdges: Edge[] = [];
-
-  let currentHorizontalIndex = 0;
-  let currentVerticalPixel = 0;
-  let snakeDirection = 1;
-
-  let previousTrunkNodeId: string | null = null;
-  let previousTrunkPosition: { x: number; y: number } | null = null;
-  let previousConvergingLeaves: string[] = [];
-
-  const getEdgeHandles = (
-    fromPosition: { x: number; y: number },
-    toPosition: { x: number; y: number }
-  ) => {
-    if (toPosition.y > fromPosition.y)
-      return { sourceHandle: "bottom-s", targetHandle: "top-t" };
-    if (toPosition.x > fromPosition.x)
-      return { sourceHandle: "right-s", targetHandle: "left-t" };
-    return { sourceHandle: "left-s", targetHandle: "right-t" };
-  };
-
-  refinedQuestions.forEach((currentQuestion) => {
-    const questionId = currentQuestion.id.toString();
-
-    if (branchChildSet.has(questionId)) return;
-
-    const currentPosition = {
-      x: currentHorizontalIndex * config.horizontalSpacing,
-      y: currentVerticalPixel,
-    };
-    calculatedPositions[questionId] = currentPosition;
-
-    // Connect previous leaves back to this new trunk node
-    if (previousConvergingLeaves.length > 0) {
-      previousConvergingLeaves.forEach((leafId) => {
-        generatedEdges.push({
-          id: `seq-${leafId}-${questionId}`,
-          source: leafId,
-          target: questionId,
-          sourceHandle: "bottom-s",
-          targetHandle: "top-t",
-          type: "step",
-          style: { stroke: "#9ca3af", strokeWidth: 2 },
-        });
-      });
-    } else if (previousTrunkNodeId && previousTrunkPosition) {
-      const handles = getEdgeHandles(previousTrunkPosition, currentPosition);
-      generatedEdges.push({
-        id: `seq-${previousTrunkNodeId}-${questionId}`,
-        source: previousTrunkNodeId,
-        target: questionId,
-        sourceHandle: handles.sourceHandle,
-        targetHandle: handles.targetHandle,
-        type: "smoothstep",
-        style: { stroke: "#9ca3af", strokeWidth: 2 },
-      });
-    }
-
-    const childBranches = branchChildrenMap[questionId] || [];
-
-    if (childBranches.length > 0) {
-      let maximumClusterVerticalPixel = currentVerticalPixel;
-      let currentClusterLeaves: string[] = [];
-
-      function placeBranchesRecursively(
-        parentId: string,
-        parentPosition: { x: number; y: number }
-      ) {
-        const nestedChildren = branchChildrenMap[parentId] || [];
-
-        if (nestedChildren.length === 0) {
-          currentClusterLeaves.push(parentId);
-          maximumClusterVerticalPixel = Math.max(
-            maximumClusterVerticalPixel,
-            parentPosition.y
-          );
-          return;
-        }
-
-        const branchVerticalPixel =
-          parentPosition.y + config.verticalBranchSpacing;
-        const totalBranchWidth =
-          (nestedChildren.length - 1) * config.horizontalSpacing;
-        const startHorizontalPixel = Math.max(
-          0,
-          parentPosition.x - totalBranchWidth / 2
-        );
-
-        nestedChildren.forEach((childId, index) => {
-          const childPosition = {
-            x: startHorizontalPixel + index * config.horizontalSpacing,
-            y: branchVerticalPixel,
-          };
-          calculatedPositions[childId] = childPosition;
-
-          generatedEdges.push({
-            id: `branch-${parentId}-${childId}`,
-            source: parentId,
-            target: childId,
-            sourceHandle: "bottom-s",
-            targetHandle: "top-t",
-            type: "smoothstep",
-            animated: true,
-            style: { stroke: "#3b82f6", strokeWidth: 2 },
-          });
-
-          placeBranchesRecursively(childId, childPosition);
-        });
-      }
-
-      const topLevelBranchVerticalPixel =
-        currentVerticalPixel + config.verticalBranchSpacing;
-      const topLevelTotalWidth =
-        (childBranches.length - 1) * config.horizontalSpacing;
-      const topLevelStartHorizontalPixel = Math.max(
-        0,
-        currentPosition.x - topLevelTotalWidth / 2
-      );
-
-      childBranches.forEach((branchId, index) => {
-        const branchPosition = {
-          x: topLevelStartHorizontalPixel + index * config.horizontalSpacing,
-          y: topLevelBranchVerticalPixel,
-        };
-        calculatedPositions[branchId] = branchPosition;
-
-        generatedEdges.push({
-          id: `branch-${questionId}-${branchId}`,
-          source: questionId,
-          target: branchId,
-          sourceHandle: "bottom-s",
-          targetHandle: "top-t",
-          type: "smoothstep",
-          animated: true,
-          style: { stroke: "#3b82f6", strokeWidth: 2 },
-        });
-
-        placeBranchesRecursively(branchId, branchPosition);
-      });
-
-      currentVerticalPixel =
-        maximumClusterVerticalPixel + config.verticalRowSpacing;
-      currentHorizontalIndex = 0;
-      snakeDirection = 1;
-
-      previousConvergingLeaves = currentClusterLeaves;
-      previousTrunkNodeId = questionId;
-      previousTrunkPosition = currentPosition;
-    } else {
-      if (snakeDirection === 1) {
-        if (currentHorizontalIndex >= config.maxNodesPerLevel - 1) {
-          currentVerticalPixel += config.verticalRowSpacing;
-          snakeDirection = -1;
-        } else {
-          currentHorizontalIndex++;
-        }
-      } else {
-        if (currentHorizontalIndex <= 0) {
-          currentVerticalPixel += config.verticalRowSpacing;
-          snakeDirection = 1;
-        } else {
-          currentHorizontalIndex--;
-        }
-      }
-
-      previousConvergingLeaves = [];
-      previousTrunkNodeId = questionId;
-      previousTrunkPosition = currentPosition;
-    }
-  });
-
-  return { calculatedPositions, generatedEdges };
-}
-
-/**
- * Creates ReactFlow nodes with termination points and edges
- */
-export function createReactFlowNodesAndTerminations(
-  refinedQuestions: Question[],
-  calculatedPositions: Record<string, { x: number; y: number }>,
   logicMap: Record<string, QuestionLogic>,
   blocks: Record<string, SurveyBlock>,
   readableCondition: (node: LogicNode | null | undefined) => string
-) {
-  const reactFlowNodes: Node[] = [];
-  const terminationEdges: Edge[] = [];
+): { nodes: Node[]; edges: Edge[] } {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-  refinedQuestions.forEach((question) => {
+  dagreGraph.setGraph({ 
+    rankdir: 'LR', 
+    ranksep: 100,  
+    nodesep: 60,   
+  });
+
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+  const safeBlocks = blocks || {};
+
+  // Strip out empty structural markers so they don't break the layout
+  const validQuestions = refinedQuestions.filter(q => !/loop\s*start|loop\s*end/i.test(q.name));
+
+  // --- PASS 1: GENERATE NODES ---
+  validQuestions.forEach((question) => {
     const questionId = question.id.toString();
-    const position = calculatedPositions[questionId];
-    if (!position) return;
-
     const logic = logicMap[questionId];
-    const isQuestionInLoop = question.parentBlocks.some(
-      (blockId) => blocks[blockId]?.type === "Loop"
-    );
+    
+    const rawShowText = (logic as any)?.rawShowText || (typeof logic?.show === 'string' ? logic.show : null);
+    const finalLogicText = logic?.show && typeof logic.show !== 'string' 
+      ? readableCondition(logic.show) 
+      : rawShowText;
 
-    reactFlowNodes.push({
+    const rawTermText = (logic as any)?.rawTerminateText || (typeof logic?.terminate === 'string' ? logic.terminate : null);
+
+    nodes.push({
       id: questionId,
       type: "questionNode",
-      position: position,
+      position: { x: 0, y: 0 },
       data: {
         label: question.name,
-        fullName: question.fullName,
+        fullName: question.name, // Keep node text short and readable
         type: question.type,
         sectionName: question.sectionName,
-        hasLogic: !!logic?.show,
-        logicText: logic?.show ? readableCondition(logic.show) : undefined,
-        isInLoop: isQuestionInLoop,
+        hasLogic: !!logic?.show || !!logic?.terminate || !!finalLogicText,
+        logicText: finalLogicText,
+        isInLoop: question.parentBlocks.some(bId => safeBlocks[bId]?.type === "Loop"),
       },
-      className: isQuestionInLoop
+      className: question.parentBlocks.some(bId => safeBlocks[bId]?.type === "Loop")
         ? "border-2 border-dashed border-orange-500 bg-orange-50"
         : "",
     });
 
-    if (logic?.terminate) {
-      const terminationId = `TERM-${questionId}`;
-      reactFlowNodes.push({
-        id: terminationId,
+    // Generate Terminate Nodes (Hidden from Dagre, pinned later)
+    if (logic?.terminate || rawTermText) {
+      nodes.push({
+        id: `TERM-${questionId}`,
         type: "output",
-        position: { x: position.x + 200, y: position.y + 90 },
-        data: { label: "🛑 TERMINATE" },
-        className:
-          "bg-red-50 border border-red-500 text-red-700 text-xs w-[110px] text-center rounded z-10",
+        position: { x: 0, y: 0 },
+        data: { 
+          label: "🛑 TERMINATE",
+          logicText: rawTermText 
+        },
+        className: "bg-red-50 border border-red-500 text-red-700 text-xs w-[250px] text-left rounded shadow-sm z-10 p-2",
       });
 
-      terminationEdges.push({
+      edges.push({
         id: `e-term-${questionId}`,
         source: questionId,
-        target: terminationId,
-        sourceHandle: "right-s",
+        target: `TERM-${questionId}`,
+        sourceHandle: "bottom-s", 
         targetHandle: "top-t",
-        type: "step",
+        type: "smoothstep",
         style: { stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "4 4" },
       });
     }
   });
 
-  return { mappedNodes: reactFlowNodes, terminationEdges };
-}
+  // --- PASS 2: THE "FLOATING TAILS" GROUPING ALGORITHM ---
+  let lastUnconditionalId: string | null = null;
+  
+  // Maps the logic text to the ID of the last node in that specific logic sequence
+  const floatingTails = new Map<string, string>(); 
 
-/**
- * Creates special edges for long-distance dependencies and loops
- */
-export function createSpecialEdges(
-  longDistanceDependencies: { source: string; target: string }[],
-  blocks: Record<string, SurveyBlock>
-) {
-  const specialEdges: Edge[] = [];
+  validQuestions.forEach((question) => {
+    const qId = question.id.toString();
+    const node = nodes.find(n => n.id === qId);
+    if (!node) return;
 
-  longDistanceDependencies.forEach((dependency) => {
-    specialEdges.push({
-      id: `ld-logic-${dependency.source}-${dependency.target}`,
-      source: dependency.source,
-      target: dependency.target,
-      sourceHandle: "bottom-s",
-      targetHandle: "top-t",
-      type: "smoothstep",
-      animated: true,
-      style: {
-        stroke: "#3b82f6",
-        strokeWidth: 2,
-        strokeDasharray: "5 5",
-        opacity: 0.6,
+    const logicTxt = node.data.logicText;
+
+    if (!logicTxt) {
+      // 1. UNCONDITIONAL NODE (Main Spine)
+      // Merge ALL active branches back into this node
+      if (floatingTails.size > 0) {
+        floatingTails.forEach((tailId) => {
+          edges.push({
+            id: `merge-${tailId}-${qId}`,
+            source: tailId,
+            target: qId,
+            sourceHandle: "right-s",
+            targetHandle: "left-t",
+            type: "smoothstep",
+            style: { stroke: "#9ca3af", strokeWidth: 2 },
+          });
+        });
+        floatingTails.clear(); // Reset active branches
+      } else if (lastUnconditionalId) {
+        // If there were no branches, just continue the main spine
+        edges.push({
+          id: `seq-${lastUnconditionalId}-${qId}`,
+          source: lastUnconditionalId,
+          target: qId,
+          sourceHandle: "right-s",
+          targetHandle: "left-t",
+          type: "smoothstep",
+          style: { stroke: "#9ca3af", strokeWidth: 2 },
+        });
+      }
+      lastUnconditionalId = qId;
+      
+    } else {
+      // 2. CONDITIONAL NODE (Branches)
+      if (floatingTails.has(logicTxt)) {
+        // This node shares logic with the previous node! Connect them sequentially in a block.
+        const tailId = floatingTails.get(logicTxt)!;
+        edges.push({
+          id: `seq-${tailId}-${qId}`,
+          source: tailId,
+          target: qId,
+          sourceHandle: "right-s",
+          targetHandle: "left-t",
+          type: "smoothstep",
+          style: { stroke: "#9ca3af", strokeWidth: 2 },
+        });
+        floatingTails.set(logicTxt, qId); // Update the tail of this logic block
+      } else {
+        // This is the START of a brand new branch! Connect from its parent.
+        const logicNodeAST = logicMap[qId]?.show;
+        const dependencies = extractAllParentIds(logicNodeAST);
+
+        if (dependencies.length > 0) {
+          dependencies.forEach(parentId => {
+            edges.push({
+              id: `dep-${parentId}-${qId}`,
+              source: parentId,
+              target: qId,
+              sourceHandle: "right-s", 
+              targetHandle: "left-t",
+              type: "smoothstep",
+              animated: true,
+              style: { stroke: "#3b82f6", strokeWidth: 2 },
+            });
+          });
+        } else if (lastUnconditionalId) {
+          edges.push({
+            id: `fallback-${lastUnconditionalId}-${qId}`,
+            source: lastUnconditionalId,
+            target: qId,
+            sourceHandle: "right-s",
+            targetHandle: "left-t",
+            type: "smoothstep",
+            animated: true,
+            style: { stroke: "#3b82f6", strokeWidth: 2, strokeDasharray: "5 5" },
+          });
+        }
+        floatingTails.set(logicTxt, qId); // Register new branch tail
+      }
+    }
+  });
+
+  // --- PASS 3: DRAW LOOP EDGES ---
+  const loopBlocks = Object.values(safeBlocks).filter(b => b.type === "Loop");
+  loopBlocks.forEach((loop) => {
+    // Check if the loop bounds still exist in our validQuestions array
+    if (loop.firstQuestionId && loop.lastQuestionId && 
+        validQuestions.find(q => q.id.toString() === loop.firstQuestionId) &&
+        validQuestions.find(q => q.id.toString() === loop.lastQuestionId)) {
+      edges.push({
+        id: `loop-edge-${loop.id}`,
+        source: loop.lastQuestionId,
+        target: loop.firstQuestionId,
+        sourceHandle: "top-s", 
+        targetHandle: "top-t", // Connect Top-to-Top so it arcs backward cleanly
+        type: "step",
+        animated: true,
+        style: { stroke: "#f97316", strokeWidth: 3, strokeDasharray: "6 6" },
+        label: "↻ Loop Iteration",
+        labelStyle: { fill: "#f97316", fontWeight: 700, fontSize: 10 },
+        labelBgPadding: [4, 4],
+        labelBgBorderRadius: 4,
+      });
+    }
+  });
+
+  // --- PASS 4: APPLY DAGRE MAGIC ---
+  nodes.forEach((node) => {
+    if (!node.id.startsWith("TERM-")) {
+      dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
+    }
+  });
+
+  edges.forEach((edge) => {
+    if (dagreGraph.hasNode(edge.source) && dagreGraph.hasNode(edge.target)) {
+      dagreGraph.setEdge(edge.source, edge.target);
+    }
+  });
+
+  dagre.layout(dagreGraph);
+
+  // --- PASS 5: ALIGN NODES & TUCK TERMINATES ---
+  const layoutedNodes = nodes.map((node) => {
+    if (node.id.startsWith("TERM-")) {
+      const parentId = node.id.replace("TERM-", "");
+      const parentPos = dagreGraph.node(parentId);
+      if (parentPos) {
+        return {
+          ...node,
+          position: {
+            x: parentPos.x - NODE_WIDTH / 2, // Align perfectly with the left edge of parent
+            y: (parentPos.y - NODE_HEIGHT / 2) + NODE_HEIGHT + 15, // Tuck exactly 15px underneath
+          },
+        };
+      }
+    }
+
+    const nodeWithPosition = dagreGraph.node(node.id);
+    return {
+      ...node,
+      position: {
+        x: nodeWithPosition.x - NODE_WIDTH / 2,
+        y: nodeWithPosition.y - NODE_HEIGHT / 2,
       },
-    });
+    };
   });
 
-  const loopBlocksArray = Object.values(blocks).filter(
-    (block) => block.type === "Loop"
-  );
-
-  loopBlocksArray.forEach((loop) => {
-    if (!loop.firstQuestionId || !loop.lastQuestionId) return;
-
-    specialEdges.push({
-      id: `loop-${loop.id}`,
-      source: loop.lastQuestionId,
-      target: loop.firstQuestionId,
-      type: "step",
-      animated: true,
-      style: { stroke: "#f97316", strokeWidth: 3, strokeDasharray: "5 5" },
-      sourceHandle: "top-s",
-      targetHandle: "top-t",
-    });
-  });
-
-  return specialEdges;
+  return { nodes: layoutedNodes, edges };
 }
