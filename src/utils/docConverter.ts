@@ -18,7 +18,7 @@ export async function convertDocxToQuestions(
     const rawQuestions = parseHtmlToQuestions(result.value);
     
     // 2. Clean, Merge, and Rescue
-    const processedQuestions = cleanAndMergeQuestions(rawQuestions);
+    const processedQuestions = cleanAndMergeQuestions(rawQuestions);    
 
     return Array.isArray(processedQuestions) ? processedQuestions : [];
   } catch (error) {

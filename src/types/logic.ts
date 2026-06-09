@@ -27,6 +27,7 @@ export interface SurveyBlock {
   firstQuestionId: string | null;
   lastQuestionId: string | null;
   logic?: QuestionLogic;
+  logicText?: string;
 }
 
 export interface Question {

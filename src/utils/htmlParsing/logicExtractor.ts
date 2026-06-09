@@ -36,19 +36,16 @@ export function processParagraphElement(
     let cleanPart = part.replace(/^-\s*/, "").trim();
     const lower = cleanPart.toLowerCase();
 
-    if (lower.startsWith("show ") || lower.startsWith("if ")) {
+    if (/^(show|if)\b/i.test(lower)) {
       state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
-    } else if (lower.startsWith("terminate ") || lower.startsWith("delay ")) {
+    } else if (/^(terminate|delay)\b/i.test(lower)) {
       state.pendingTerminate = (state.pendingTerminate ? state.pendingTerminate + "\n" : "") + cleanPart;
-      
     // FIX: Catch modifiers, masking logic, and comments so they aren't thrown away!
     } else if (
-      lower.startsWith("programmer comment") ||
+      /^(programmer comment|only show|hide)\b/i.test(lower) ||
       lower.includes("qcflag") ||
-      lower.startsWith("only show") ||
-      lower.startsWith("hide")
+      /(rows|columns|stubs).*selected/i.test(lower)
     ) {
-      // Append these as secondary instructions to the show logic string
       state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
     }
   }

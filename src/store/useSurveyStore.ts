@@ -147,60 +147,140 @@ export const useSurveyStore = create<SurveyStore>()(
     getFlowElements: () => {
       const { refinedQuestions, convertedQuestions, logicMap, blocks } = get();
       
-      // 1. THE BRIDGE: Use refined if available, otherwise fallback to converted DOCX data
       const sourceQuestions = refinedQuestions.length > 0 ? refinedQuestions : convertedQuestions;
-
+      
       if (sourceQuestions.length === 0) {
         console.warn("Graph generation aborted: No questions available.");
         return;
       }
 
-      // 2. ADAPT: Map ConvertedQuestions to look like standard Questions for the layout engine
-      const mappedQuestions = sourceQuestions.map((q: any) => ({
-        id: q.id as unknown as number, // Override type mismatch (string vs number)
+      // --- 1. DYNAMIC BLOCK REBUILDER (No Hardcoding!) ---
+      const dynamicBlocks: Record<string, any> = { ...blocks };
+      const activeBlocks: any[] = []; // Tracks open blocks like a stack
+      let blockCounter = 1;
+
+      const processedQuestions: any[] = [];
+
+      for (const q of sourceQuestions) {
+        const name = (q.name || "").trim();
+        const text = (q.text || "").trim();
+        const isMarker = q.type === "Structural Marker";
+
+        if (isMarker) {
+          const lowerText = text.toLowerCase();
+          
+          let type = "Section";
+          if (lowerText.includes("loop")) type = "Loop";
+          else if (lowerText.includes("subsection")) type = "Subsection";
+          else if (lowerText.includes("page")) type = "Page";
+
+          if (lowerText.includes("start")) {
+            const cleanName = text.replace(/^(loop|subsection|section|page)\s*start\s*-?\s*/i, "").trim() || type;
+            const blockId = `block_${type.toLowerCase()}_${blockCounter++}`;
+            
+            dynamicBlocks[blockId] = {
+              id: blockId,
+              type: type as any, // Cast to BlockType if needed
+              name: cleanName,
+              // FIX: Assert as ConvertedQuestion to safely access showLogic
+              logicText: (q as ConvertedQuestion).showLogic?.text || "", 
+              firstQuestionId: null,
+              lastQuestionId: null
+            };
+            activeBlocks.push(dynamicBlocks[blockId]);
+            
+          } 
+          else if (lowerText.includes("end")) {
+            for (let i = activeBlocks.length - 1; i >= 0; i--) {
+              if (activeBlocks[i].type === type) {
+                activeBlocks.splice(i, 1);
+                break;
+              }
+            }
+          }
+          continue; 
+        }
+
+        // --- MERGE CONTROLLER QUESTIONS ---
+        const currentLoop = activeBlocks.find(b => b.type === "Loop");
+        if (currentLoop && name === currentLoop.name) {
+          // FIX: Assert as ConvertedQuestion here too
+          const qAsConverted = q as ConvertedQuestion;
+          if (qAsConverted.showLogic?.text) {
+            const existingLogic = dynamicBlocks[currentLoop.id].logicText;
+            dynamicBlocks[currentLoop.id].logicText = existingLogic 
+              ? `${existingLogic}\n${qAsConverted.showLogic.text}` 
+              : qAsConverted.showLogic.text;
+          }
+          continue; 
+        }
+        // Tag standard questions with ALL active nested blocks
+        processedQuestions.push({
+          ...q,
+          parentBlocks: activeBlocks.map(b => b.id),
+        });
+      }
+
+      // --- 2. ADAPT QUESTIONS ---
+      const mappedQuestions = processedQuestions.map((q: any) => ({
+        id: q.id as unknown as number, 
         uniqueKey: q.id.toString(),
         name: q.name || q.id,
-        fullName: q.text || q.name, 
-        text: q.text || null, // FIX: Added missing required property
+        fullName: q.name || q.id, 
+        text: q.text || null, 
         type: q.type,
-        parentBlocks: q.parentBlocks || [],
+        parentBlocks: q.parentBlocks, 
         sectionName: q.parentBlocks?.[0] || "", 
         rows: [],
         columns: [],
         listOrder: 0
-      })) as unknown as Question[]; // Double cast to ensure TS accepts the bridge
+      })) as unknown as Question[];
 
-      // 3. Resolve Logic Map
-      const resolvedLogicMap: Record<string, QuestionLogic> = {};
+      // --- 3. RESOLVE LOGIC MAP ---
+      const resolvedLogicMap: Record<string, any> = {};
       mappedQuestions.forEach((question) => {
-        const convertedQ = convertedQuestions.find(c => c.id.toString() === question.id.toString());
+        const convertedQ = processedQuestions.find(c => c.id.toString() === question.id.toString());
         
         if (convertedQ && (convertedQ.showLogic?.text || convertedQ.terminateLogic?.text)) {
-           // THE MAGIC HAPPENS HERE: Translate the text to AST!
            resolvedLogicMap[question.id.toString()] = {
-              show: parseTextToLogicNode(convertedQ.showLogic.text),
+              show: parseTextToLogicNode(convertedQ.showLogic.text), 
               terminate: parseTextToLogicNode(convertedQ.terminateLogic.text),
+              rawShowText: convertedQ.showLogic.text, 
+              rawTerminateText: convertedQ.terminateLogic.text
            };
         } else {
            resolvedLogicMap[question.id.toString()] = resolveEffectiveLogic(
              question.id.toString(),
              mappedQuestions,
-             blocks,
+             dynamicBlocks,
              logicMap
            );
         }
       });
-      
-      // 4. Generate Graph using Dagre Layout Engine
+
+      // --- 4. GENERATE GRAPH ---
       const { nodes, edges } = buildGraphLevelLayout(
         mappedQuestions,
         resolvedLogicMap,
-        blocks,
+        dynamicBlocks, 
         readableCondition
       );
 
-      const paths = calculateAllPaths(nodes, edges);
-      set({ nodes, edges, paths });
+      // --- 5. PATH DEDUPLICATOR (Fixes the 14 Paths bug) ---
+      const rawPaths = calculateAllPaths(nodes, edges);
+      const uniquePathsMap = new Map<string, string[]>();
+      
+      rawPaths.forEach(path => {
+        // Create a signature of the path (ignoring Terminate nodes)
+        const signature = path.filter(p => !p.startsWith("TERM-")).join("->");
+        if (!uniquePathsMap.has(signature)) {
+          uniquePathsMap.set(signature, path);
+        }
+      });
+      
+      const deduplicatedPaths = Array.from(uniquePathsMap.values());
+
+      set({ nodes, edges, paths: deduplicatedPaths });
     },
   }))
 );

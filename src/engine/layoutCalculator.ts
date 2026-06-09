@@ -5,214 +5,236 @@ import { Question, QuestionLogic, SurveyBlock, LogicNode } from "../types/logic"
 const NODE_WIDTH = 250;
 const NODE_HEIGHT = 120;
 
-export function extractAllParentIds(
-  node: LogicNode | null | undefined,
-  ids = new Set<string>()
-): string[] {
-  if (!node) return [];
-  if (node.type === "leaf" && node.questionId) {
-    ids.add(node.questionId.toString());
-  } else if (node.type === "branch" && node.children) {
-    node.children.forEach((child) => extractAllParentIds(child, ids));
+// ==========================================
+// 1. UTILITIES (The Upgraded Parent Extractor)
+// ==========================================
+
+export function extractClosestParentId(
+  logicNode: LogicNode | null | undefined,
+  rawLogicText: string | null | undefined,
+  validQuestionIds: string[],
+  currentIndex: number
+): string | null {
+  const rawIds = new Set<string>();
+
+  // 1. Try AST extraction first
+  function traverse(n: LogicNode) {
+    if (n.type === "leaf" && n.questionId) {
+      rawIds.add(n.questionId.toString());
+    } else if (n.type === "branch" && n.children) {
+      n.children.forEach(traverse);
+    }
   }
-  return Array.from(ids);
-}
+  if (logicNode) traverse(logicNode);
 
-export function getLayoutedGraph(
-  refinedQuestions: Question[],
-  logicMap: Record<string, QuestionLogic>,
-  blocks: Record<string, SurveyBlock>,
-  readableCondition: (node: LogicNode | null | undefined) => string
-): { nodes: Node[]; edges: Edge[] } {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  // 2. The Regex Safety Net: Scan raw text for known Question IDs
+  if (rawLogicText) {
+    validQuestionIds.forEach(id => {
+      // Escape the ID safely and look for it as a whole word
+      const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escapedId}\\b`, 'i');
+      if (regex.test(rawLogicText)) {
+        rawIds.add(id);
+      }
+    });
+  }
 
-  dagreGraph.setGraph({ 
-    rankdir: 'LR', 
-    ranksep: 100,  
-    nodesep: 60,   
+  if (rawIds.size === 0) return null;
+
+  // 3. Find the LATEST valid parent (chronologically closest to the current node)
+  let closestIdx = -1;
+  let closestId: string | null = null;
+
+  rawIds.forEach(id => {
+    const idx = validQuestionIds.indexOf(id);
+    // Ensure the parent actually occurs BEFORE the current question in the survey
+    if (idx > closestIdx && idx < currentIndex) {
+      closestIdx = idx;
+      closestId = id;
+    }
   });
 
+  return closestId;
+}
+
+function isNodeBranching(logicText: string | null): boolean {
+  if (!logicText) return false;
+  const lowerText = logicText.toLowerCase();
+  const isUnconditional = lowerText.includes("show to all");
+  const isMasking = lowerText.includes("only show") || lowerText.match(/(rows|columns|stubs).*selected/);
+  return !isUnconditional && !isMasking;
+}
+
+// ==========================================
+// 2. NODE BUILDER
+// ==========================================
+
+function buildNodes(
+  validQuestions: Question[],
+  logicMap: Record<string, QuestionLogic>,
+  readableCondition: (node: LogicNode | null | undefined) => string
+): { nodes: Node[]; termEdges: Edge[] } {
   const nodes: Node[] = [];
-  const edges: Edge[] = [];
-  const safeBlocks = blocks || {};
+  const termEdges: Edge[] = [];
 
-  // Strip out empty structural markers so they don't break the layout
-  const validQuestions = refinedQuestions.filter(q => !/loop\s*start|loop\s*end/i.test(q.name));
-
-  // --- PASS 1: GENERATE NODES ---
   validQuestions.forEach((question) => {
-    const questionId = question.id.toString();
-    const logic = logicMap[questionId];
+    const qId = question.id.toString();
+    const logic = logicMap[qId];
     
     const rawShowText = (logic as any)?.rawShowText || (typeof logic?.show === 'string' ? logic.show : null);
-    const finalLogicText = logic?.show && typeof logic.show !== 'string' 
-      ? readableCondition(logic.show) 
-      : rawShowText;
-
+    const finalLogicText = logic?.show && typeof logic.show !== 'string' ? readableCondition(logic.show) : rawShowText;
     const rawTermText = (logic as any)?.rawTerminateText || (typeof logic?.terminate === 'string' ? logic.terminate : null);
 
     nodes.push({
-      id: questionId,
+      id: qId,
       type: "questionNode",
       position: { x: 0, y: 0 },
       data: {
         label: question.name,
-        fullName: question.name, // Keep node text short and readable
+        fullName: question.name,
         type: question.type,
         sectionName: question.sectionName,
         hasLogic: !!logic?.show || !!logic?.terminate || !!finalLogicText,
         logicText: finalLogicText,
-        isInLoop: question.parentBlocks.some(bId => safeBlocks[bId]?.type === "Loop"),
+        isBranchingLogic: isNodeBranching(finalLogicText),
       },
-      className: question.parentBlocks.some(bId => safeBlocks[bId]?.type === "Loop")
-        ? "border-2 border-dashed border-orange-500 bg-orange-50"
-        : "",
     });
 
-    // Generate Terminate Nodes (Hidden from Dagre, pinned later)
     if (logic?.terminate || rawTermText) {
       nodes.push({
-        id: `TERM-${questionId}`,
+        id: `TERM-${qId}`,
         type: "output",
         position: { x: 0, y: 0 },
-        data: { 
-          label: "🛑 TERMINATE",
-          logicText: rawTermText 
-        },
+        data: { label: "🛑 TERMINATE", logicText: rawTermText },
         className: "bg-red-50 border border-red-500 text-red-700 text-xs w-[250px] text-left rounded shadow-sm z-10 p-2",
       });
-
-      edges.push({
-        id: `e-term-${questionId}`,
-        source: questionId,
-        target: `TERM-${questionId}`,
-        sourceHandle: "bottom-s", 
-        targetHandle: "top-t",
+      termEdges.push({
+        id: `e-term-${qId}`,
+        source: qId,
+        target: `TERM-${qId}`,
+        sourceHandle: "bottom-s", targetHandle: "top-t",
         type: "smoothstep",
         style: { stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "4 4" },
       });
     }
   });
 
-  // --- PASS 2: THE "FLOATING TAILS" GROUPING ALGORITHM ---
-  let lastUnconditionalId: string | null = null;
-  
-  // Maps the logic text to the ID of the last node in that specific logic sequence
-  const floatingTails = new Map<string, string>(); 
+  return { nodes, termEdges };
+}
 
-  validQuestions.forEach((question) => {
+// ==========================================
+// 3. EDGE ROUTER (Upgraded)
+// ==========================================
+
+function buildRoutingEdges(
+  validQuestions: Question[], 
+  nodes: Node[], 
+  logicMap: Record<string, QuestionLogic>
+): Edge[] {
+  const edges: Edge[] = [];
+  const edgeSet = new Set<string>();
+
+  const safePushEdge = (edge: Edge) => {
+    const key = `${edge.source}->${edge.target}`;
+    if (!edgeSet.has(key)) {
+      edgeSet.add(key);
+      edges.push(edge);
+    }
+  };
+
+  let lastUnconditionalId: string | null = null;
+  const activeTails = new Map<string, string>(); 
+  let openBranches: string[] = []; 
+  const validIds = validQuestions.map(q => q.id.toString());
+
+  validQuestions.forEach((question, currentIndex) => {
     const qId = question.id.toString();
     const node = nodes.find(n => n.id === qId);
     if (!node) return;
 
-    const logicTxt = node.data.logicText;
+    const isBranch = node.data.isBranchingLogic;
+    const logicTxt = node.data.logicText || "unknown";
 
-    if (!logicTxt) {
-      // 1. UNCONDITIONAL NODE (Main Spine)
-      // Merge ALL active branches back into this node
-      if (floatingTails.size > 0) {
-        floatingTails.forEach((tailId) => {
-          edges.push({
-            id: `merge-${tailId}-${qId}`,
-            source: tailId,
-            target: qId,
-            sourceHandle: "right-s",
-            targetHandle: "left-t",
-            type: "smoothstep",
-            style: { stroke: "#9ca3af", strokeWidth: 2 },
-          });
-        });
-        floatingTails.clear(); // Reset active branches
-      } else if (lastUnconditionalId) {
-        // If there were no branches, just continue the main spine
-        edges.push({
+    if (!isBranch) {
+      if (lastUnconditionalId) {
+        safePushEdge({
           id: `seq-${lastUnconditionalId}-${qId}`,
-          source: lastUnconditionalId,
-          target: qId,
-          sourceHandle: "right-s",
-          targetHandle: "left-t",
-          type: "smoothstep",
-          style: { stroke: "#9ca3af", strokeWidth: 2 },
+          source: lastUnconditionalId, target: qId,
+          sourceHandle: "right-s", targetHandle: "left-t",
+          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
         });
       }
+
+      openBranches.forEach((tailId) => {
+        safePushEdge({
+          id: `merge-${tailId}-${qId}`,
+          source: tailId, target: qId,
+          sourceHandle: "right-s", targetHandle: "left-t",
+          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
+        });
+      });
+
+      openBranches = []; 
+      activeTails.clear(); 
       lastUnconditionalId = qId;
       
     } else {
-      // 2. CONDITIONAL NODE (Branches)
-      if (floatingTails.has(logicTxt)) {
-        // This node shares logic with the previous node! Connect them sequentially in a block.
-        const tailId = floatingTails.get(logicTxt)!;
-        edges.push({
+      if (activeTails.has(logicTxt)) {
+        const tailId = activeTails.get(logicTxt)!;
+        safePushEdge({
           id: `seq-${tailId}-${qId}`,
-          source: tailId,
-          target: qId,
-          sourceHandle: "right-s",
-          targetHandle: "left-t",
-          type: "smoothstep",
-          style: { stroke: "#9ca3af", strokeWidth: 2 },
+          source: tailId, target: qId,
+          sourceHandle: "right-s", targetHandle: "left-t",
+          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
         });
-        floatingTails.set(logicTxt, qId); // Update the tail of this logic block
+        
+        activeTails.set(logicTxt, qId);
+        openBranches = openBranches.filter(id => id !== tailId);
+        openBranches.push(qId);
       } else {
-        // This is the START of a brand new branch! Connect from its parent.
-        const logicNodeAST = logicMap[qId]?.show;
-        const dependencies = extractAllParentIds(logicNodeAST);
+        // THE FIX: Use the new Closest Parent Extractor!
+        const closestParentId = extractClosestParentId(
+          logicMap[qId]?.show, 
+          logicTxt, 
+          validIds, 
+          currentIndex
+        );
 
-        if (dependencies.length > 0) {
-          dependencies.forEach(parentId => {
-            edges.push({
-              id: `dep-${parentId}-${qId}`,
-              source: parentId,
-              target: qId,
-              sourceHandle: "right-s", 
-              targetHandle: "left-t",
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "#3b82f6", strokeWidth: 2 },
-            });
+        if (closestParentId) {
+          safePushEdge({
+            id: `dep-${closestParentId}-${qId}`,
+            source: closestParentId, target: qId,
+            sourceHandle: "right-s", targetHandle: "left-t",
+            type: "smoothstep", animated: true,
+            style: { stroke: "#3b82f6", strokeWidth: 2 }, 
           });
         } else if (lastUnconditionalId) {
-          edges.push({
+          safePushEdge({
             id: `fallback-${lastUnconditionalId}-${qId}`,
-            source: lastUnconditionalId,
-            target: qId,
-            sourceHandle: "right-s",
-            targetHandle: "left-t",
-            type: "smoothstep",
-            animated: true,
+            source: lastUnconditionalId, target: qId,
+            sourceHandle: "right-s", targetHandle: "left-t",
+            type: "smoothstep", animated: true,
             style: { stroke: "#3b82f6", strokeWidth: 2, strokeDasharray: "5 5" },
           });
         }
-        floatingTails.set(logicTxt, qId); // Register new branch tail
+        activeTails.set(logicTxt, qId);
+        openBranches.push(qId);
       }
     }
   });
 
-  // --- PASS 3: DRAW LOOP EDGES ---
-  const loopBlocks = Object.values(safeBlocks).filter(b => b.type === "Loop");
-  loopBlocks.forEach((loop) => {
-    // Check if the loop bounds still exist in our validQuestions array
-    if (loop.firstQuestionId && loop.lastQuestionId && 
-        validQuestions.find(q => q.id.toString() === loop.firstQuestionId) &&
-        validQuestions.find(q => q.id.toString() === loop.lastQuestionId)) {
-      edges.push({
-        id: `loop-edge-${loop.id}`,
-        source: loop.lastQuestionId,
-        target: loop.firstQuestionId,
-        sourceHandle: "top-s", 
-        targetHandle: "top-t", // Connect Top-to-Top so it arcs backward cleanly
-        type: "step",
-        animated: true,
-        style: { stroke: "#f97316", strokeWidth: 3, strokeDasharray: "6 6" },
-        label: "↻ Loop Iteration",
-        labelStyle: { fill: "#f97316", fontWeight: 700, fontSize: 10 },
-        labelBgPadding: [4, 4],
-        labelBgBorderRadius: 4,
-      });
-    }
-  });
+  return edges;
+}
 
-  // --- PASS 4: APPLY DAGRE MAGIC ---
+// ==========================================
+// 4. LAYOUT ENGINE (Dagre)
+// ==========================================
+
+function applyDagreLayout(nodes: Node[], edges: Edge[]): Node[] {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  dagreGraph.setGraph({ rankdir: 'LR', ranksep: 100, nodesep: 60 });
+
   nodes.forEach((node) => {
     if (!node.id.startsWith("TERM-")) {
       dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
@@ -227,8 +249,7 @@ export function getLayoutedGraph(
 
   dagre.layout(dagreGraph);
 
-  // --- PASS 5: ALIGN NODES & TUCK TERMINATES ---
-  const layoutedNodes = nodes.map((node) => {
+  return nodes.map((node) => {
     if (node.id.startsWith("TERM-")) {
       const parentId = node.id.replace("TERM-", "");
       const parentPos = dagreGraph.node(parentId);
@@ -236,8 +257,8 @@ export function getLayoutedGraph(
         return {
           ...node,
           position: {
-            x: parentPos.x - NODE_WIDTH / 2, // Align perfectly with the left edge of parent
-            y: (parentPos.y - NODE_HEIGHT / 2) + NODE_HEIGHT + 15, // Tuck exactly 15px underneath
+            x: parentPos.x - NODE_WIDTH / 2, 
+            y: (parentPos.y - NODE_HEIGHT / 2) + NODE_HEIGHT + 15, 
           },
         };
       }
@@ -252,6 +273,121 @@ export function getLayoutedGraph(
       },
     };
   });
+}
 
-  return { nodes: layoutedNodes, edges };
+// ==========================================
+// 5. BOUNDING BOX GENERATOR
+// ==========================================
+
+function buildBoundingBoxes(layoutedNodes: Node[], validQuestions: Question[], blocks: Record<string, SurveyBlock>): Node[] {
+  const boxNodes: Node[] = [];
+  
+  const structuralBlocks = Object.values(blocks || {}).filter(b => {
+    const isLoop = b.type === "Loop";
+    const hasSpecialLogic = b.logicText && b.logicText.trim() !== "";
+    const isStandardBlock = ["Subsection", "Section", "Page"].includes(b.type);
+    return isLoop || (isStandardBlock && hasSpecialLogic);
+  });
+
+  structuralBlocks.forEach((block) => {
+    const blockQuestionIds = validQuestions
+      .filter(q => q.parentBlocks.includes(block.id))
+      .map(q => q.id.toString());
+
+    const nodesInThisBlock = layoutedNodes.filter(n => blockQuestionIds.includes(n.id));
+
+    if (nodesInThisBlock.length > 0) {
+      const xs = nodesInThisBlock.map(n => n.position.x);
+      const ys = nodesInThisBlock.map(n => n.position.y);
+
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs) + NODE_WIDTH; 
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys) + NODE_HEIGHT;
+
+      let padding = 20;
+      let bgColor = 'rgba(243, 244, 246, 0.4)';
+      let borderColor = '#9ca3af';
+      let textColor = '#4b5563';
+      let prefix = '';
+
+      if (block.type === 'Loop') {
+        padding = 20; 
+        bgColor = 'rgba(255, 237, 213, 0.4)'; 
+        borderColor = '#f97316';
+        textColor = '#c2410c';
+        prefix = '↻ ';
+      } else if (block.type === 'Subsection') {
+        padding = 45; 
+        bgColor = 'rgba(224, 242, 254, 0.4)'; 
+        borderColor = '#0ea5e9';
+        textColor = '#0369a1';
+        prefix = '◫ ';
+      } else {
+        padding = 70; 
+        bgColor = 'rgba(243, 244, 246, 0.6)'; 
+        borderColor = '#6b7280';
+        textColor = '#374151';
+        prefix = '📄 ';
+      }
+
+      const logicPad = block.logicText ? 45 : 10;
+      const paddingTop = padding + logicPad;
+
+      const labelText = `${prefix}${block.name}${block.logicText ? `\n[Logic: ${block.logicText}]` : ''}`;
+
+      boxNodes.push({
+        id: `box-${block.id}`,
+        type: 'default',
+        position: { x: minX - padding, y: minY - paddingTop },
+        data: { label: labelText },
+        style: {
+          width: (maxX - minX) + (padding * 2),
+          height: (maxY - minY) + paddingTop + padding,
+          zIndex: -1, 
+          backgroundColor: bgColor, 
+          border: `2px dashed ${borderColor}`,
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+          padding: '12px 20px',
+          color: textColor,
+          fontWeight: 'bold',
+          fontSize: '14px',
+          whiteSpace: 'pre-wrap', 
+          pointerEvents: 'none', 
+        },
+        draggable: false, selectable: false,
+      });
+    }
+  });
+
+  return boxNodes.sort((a, b) => (b.style?.width as number) - (a.style?.width as number));
+}
+
+// ==========================================
+// 6. MAIN EXPORT
+// ==========================================
+
+export function getLayoutedGraph(
+  refinedQuestions: Question[],
+  logicMap: Record<string, QuestionLogic>,
+  blocks: Record<string, SurveyBlock>,
+  readableCondition: (node: LogicNode | null | undefined) => string
+): { nodes: Node[]; edges: Edge[] } {
+  
+  const validQuestions = refinedQuestions.filter(q => q.type !== "Structural Marker");
+
+  const { nodes, termEdges } = buildNodes(validQuestions, logicMap, readableCondition);
+  const routingEdges = buildRoutingEdges(validQuestions, nodes, logicMap);
+  
+  const allEdges = [...termEdges, ...routingEdges];
+  const layoutedNodes = applyDagreLayout(nodes, allEdges);
+
+  const boundingBoxes = buildBoundingBoxes(layoutedNodes, validQuestions, blocks);
+
+  const finalNodes = [...boundingBoxes, ...layoutedNodes];
+
+  return { nodes: finalNodes, edges: allEdges };
 }

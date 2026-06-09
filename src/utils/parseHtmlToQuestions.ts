@@ -1,8 +1,3 @@
-/**
- * Main parser for converting HTML to structured questions
- * Handles both paragraph and table-based HTML formats
- */
-
 import { ConvertedQuestion } from "../types/logic";
 import { ParsingState } from "./htmlParsing/htmlElementProcessor";
 import { processParagraphElement } from "./htmlParsing/logicExtractor";
@@ -29,10 +24,42 @@ export function parseHtmlToQuestions(html: string): ConvertedQuestion[] {
 
   const elements = Array.from(doc.body.children);
 
-  for (const el of elements) {
+  for (let i = 0; i < elements.length; i++) {
+    const el = elements[i];
     const tagName = el.tagName.toLowerCase();
 
-    if (tagName === "p" || tagName.match(/^h[1-6]$/)) {
+    // 1. Check if it is a structural marker
+    const text = el.textContent?.trim() || "";
+    const isStructuralMarker = /^(loop\s*start|loop\s*end|subsection\s*start|subsection\s*end|section\s*start|section\s*end)\b/i.test(text);
+    
+    // 2. IMPORTANT: Ignore the Table of Contents! (TOC items have href links to anchors)
+    const isTOC = el.querySelector("a[href^='#']");
+
+    if ((tagName === "p" || tagName.match(/^h[1-6]$/)) && isStructuralMarker && !isTOC) {
+      // Push any open table question first
+      if (currentQuestion) {
+        questions.push(currentQuestion);
+        currentQuestion = null;
+      }
+
+      // INJECT THE STRUCTURAL MARKER INTO THE DATA STREAM!
+      questions.push({
+        id: `MARKER_${i}`, // Unique ID so the merger ignores it
+        name: text,
+        type: "Structural Marker",
+        text: text,
+        parentBlocks: [],
+        showLogic: { text: null, condition: null },
+        terminateLogic: { text: null, condition: null },
+        options: []
+      } as unknown as ConvertedQuestion);
+
+      // Reset pending state so this text doesn't accidentally bleed into the next question
+      parsingState.pendingName = "";
+      parsingState.pendingShow = "";
+      parsingState.pendingTerminate = "";
+
+    } else if (tagName === "p" || tagName.match(/^h[1-6]$/)) {
       processParagraphElement(el, parsingState);
     } else if (tagName === "table") {
       currentQuestion = processTableElement(
