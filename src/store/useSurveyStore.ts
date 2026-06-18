@@ -259,6 +259,7 @@ export const useSurveyStore = create<SurveyStore>()(
       });
 
       // --- 4. GENERATE GRAPH ---
+      // (Using your perfected layoutCalculator code!)
       const { nodes, edges } = buildGraphLevelLayout(
         mappedQuestions,
         resolvedLogicMap,
@@ -266,19 +267,43 @@ export const useSurveyStore = create<SurveyStore>()(
         readableCondition
       );
 
-      // --- 5. PATH DEDUPLICATOR (Fixes the 14 Paths bug) ---
-      const rawPaths = calculateAllPaths(nodes, edges);
+      // --- 5. THE ULTIMATE PATH SANITIZER ---
+      // 1. Hide the background boxes so they don't count as isolated nodes
+      const pathableNodes = nodes.filter(n => !n.id.startsWith("box-"));
+      
+      // 2. Hide backwards loop edges! If DFS walks backwards, it doubles the paths!
+      const pathableEdges = edges.filter(e => !e.id.startsWith("loop-edge-"));
+      
+      // Calculate paths using the sanitized arrays
+      const rawPaths = calculateAllPaths(pathableNodes, pathableEdges);
       const uniquePathsMap = new Map<string, string[]>();
       
+      // 3. Deduplicate exact matches (ignoring Terminate nodes)
       rawPaths.forEach(path => {
-        // Create a signature of the path (ignoring Terminate nodes)
         const signature = path.filter(p => !p.startsWith("TERM-")).join("->");
         if (!uniquePathsMap.has(signature)) {
           uniquePathsMap.set(signature, path);
         }
       });
       
-      const deduplicatedPaths = Array.from(uniquePathsMap.values());
+      let deduplicatedPaths = Array.from(uniquePathsMap.values());
+
+      // 4. Strip out "Partial Walks" (Subsets)
+      // If Path A is "S1->S2" and Path B is "S1->S2->S3", Path A is a fake partial path. Delete it!
+      deduplicatedPaths = deduplicatedPaths.filter((currentPath, index, array) => {
+         const currentStr = currentPath.join("->");
+         
+         const isSubset = array.some((otherPath, otherIndex) => {
+            if (index === otherIndex) return false;
+            const otherStr = otherPath.join("->");
+            return otherStr.includes(currentStr) && otherStr.length > currentStr.length;
+         });
+         
+         // If a path ends in a Terminate node, it's a valid unique route! Protect it from deletion.
+         const isTerminate = currentPath[currentPath.length - 1].startsWith("TERM-");
+         
+         return !isSubset || isTerminate;
+      });
 
       set({ nodes, edges, paths: deduplicatedPaths });
     },
