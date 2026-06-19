@@ -259,7 +259,6 @@ export const useSurveyStore = create<SurveyStore>()(
       });
 
       // --- 4. GENERATE GRAPH ---
-      // (Using your perfected layoutCalculator code!)
       const { nodes, edges } = buildGraphLevelLayout(
         mappedQuestions,
         resolvedLogicMap,
@@ -267,42 +266,87 @@ export const useSurveyStore = create<SurveyStore>()(
         readableCondition
       );
 
-      // --- 5. THE ULTIMATE PATH SANITIZER ---
-      // 1. Hide the background boxes so they don't count as isolated nodes
+      // --- 5. DETERMINISTIC TRACK CALCULATOR ---
       const pathableNodes = nodes.filter(n => !n.id.startsWith("box-"));
-      
-      // 2. Hide backwards loop edges! If DFS walks backwards, it doubles the paths!
-      const pathableEdges = edges.filter(e => !e.id.startsWith("loop-edge-"));
-      
-      // Calculate paths using the sanitized arrays
-      const rawPaths = calculateAllPaths(pathableNodes, pathableEdges);
-      const uniquePathsMap = new Map<string, string[]>();
-      
-      // 3. Deduplicate exact matches (ignoring Terminate nodes)
-      rawPaths.forEach(path => {
-        const signature = path.filter(p => !p.startsWith("TERM-")).join("->");
-        if (!uniquePathsMap.has(signature)) {
-          uniquePathsMap.set(signature, path);
+
+      // Step A: Find all unique logic conditions
+      const uniqueLogicTracks = new Set<string>();
+      pathableNodes.forEach(n => {
+        if (n.data?.isBranchingLogic && n.data?.logicText) {
+          uniqueLogicTracks.add(n.data.logicText);
+        }
+        // We still register term logic so we know a distinct conditional exit exists
+        if (n.id.startsWith("TERM-") && n.data?.logicText) {
+          uniqueLogicTracks.add(n.data.logicText);
         }
       });
-      
-      let deduplicatedPaths = Array.from(uniquePathsMap.values());
 
-      // 4. Strip out "Partial Walks" (Subsets)
-      // If Path A is "S1->S2" and Path B is "S1->S2->S3", Path A is a fake partial path. Delete it!
+      const linearPaths: string[][] = [];
+
+      // Step B: Build the Base Spine
+      const baseSpine: string[] = [];
+      for (const node of pathableNodes) {
+        if (node.id.startsWith("TERM-")) {
+          // If a node terminates unconditionally, the main survey spine physically ends here!
+          if (!node.data?.logicText && baseSpine.includes(node.id.replace("TERM-", ""))) {
+            break; 
+          }
+        } else if (!node.data?.isBranchingLogic) {
+          baseSpine.push(node.id);
+        }
+      }
+      linearPaths.push(baseSpine);
+
+      // Step C: Build Tracks
+      Array.from(uniqueLogicTracks).forEach(trackLogic => {
+        const trackPath: string[] = [];
+        
+        for (const node of pathableNodes) {
+          if (node.id.startsWith("TERM-")) {
+            const parentId = node.id.replace("TERM-", "");
+            const isUnconditionalTerm = !node.data?.logicText;
+            const isTrackTerm = node.data?.logicText === trackLogic;
+
+            // Stop the path from continuing if it hits a termination!
+            if (isTrackTerm || (isUnconditionalTerm && trackPath.includes(parentId))) {
+              if (!trackPath.includes(parentId)) trackPath.push(parentId);
+              break; // The path ends here.
+            }
+          } else {
+            if (!node.data?.isBranchingLogic || node.data?.logicText === trackLogic) {
+              trackPath.push(node.id);
+            }
+          }
+        }
+        linearPaths.push(trackPath);
+      });
+
+      // Step D: Final Deduplication & SCRUBBING
+      const finalPathsMap = new Map<string, string[]>();
+      linearPaths.forEach(path => {
+        // Strip out the "TERM-" node IDs from the final arrays.
+        const cleanPath = path.filter(p => !p.startsWith("TERM-"));
+        
+        const signature = cleanPath.join("->");
+        if (signature && !finalPathsMap.has(signature)) {
+          finalPathsMap.set(signature, cleanPath);
+        }
+      });
+
+      let deduplicatedPaths = Array.from(finalPathsMap.values());
+
+      // THE FIX: Sweep away short "stub" paths (early terminations) so they don't get buttons!
       deduplicatedPaths = deduplicatedPaths.filter((currentPath, index, array) => {
          const currentStr = currentPath.join("->");
          
          const isSubset = array.some((otherPath, otherIndex) => {
             if (index === otherIndex) return false;
             const otherStr = otherPath.join("->");
+            // If the current path is entirely contained within another longer path, it's a subset
             return otherStr.includes(currentStr) && otherStr.length > currentStr.length;
          });
          
-         // If a path ends in a Terminate node, it's a valid unique route! Protect it from deletion.
-         const isTerminate = currentPath[currentPath.length - 1].startsWith("TERM-");
-         
-         return !isSubset || isTerminate;
+         return !isSubset; 
       });
 
       set({ nodes, edges, paths: deduplicatedPaths });
