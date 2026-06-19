@@ -6,7 +6,8 @@
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noEmit": true
   },
   "include": ["vite.config.js"]
 }

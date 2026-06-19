@@ -27,6 +27,7 @@ export interface SurveyBlock {
   firstQuestionId: string | null;
   lastQuestionId: string | null;
   logic?: QuestionLogic;
+  logicText?: string;
 }
 
 export interface Question {
@@ -108,4 +109,41 @@ export interface LoopBlock {
   startQuestionId: string;
   endQuestionId: string;
   loopName?: string; // Optional: e.g., "Brand Loop"
+}
+
+/**
+ * Logic text representation for converted documents
+ * This is a text-based representation that can be viewed/edited before converting to LogicNode
+ */
+export interface LogicTextRepresentation {
+  text: string | null;
+  condition?: LogicNode | null; // Will be populated when editing in LogicMap
+}
+
+/**
+ * Option/Stub in a converted question (from document upload)
+ */
+export interface ConvertedOption {
+  id: string; 
+  text: string;
+  isExclusive: boolean;
+  isAnchor: boolean;
+  isAlwaysShown: boolean;
+  showLogic: LogicTextRepresentation;
+  terminateLogic: LogicTextRepresentation;
+}
+
+/**
+ * Question format after converting from document upload
+ * This is the intermediate format between raw document and LogicNode structures
+ */
+export interface ConvertedQuestion {
+  id: string; // Question ID, e.g., "S8"
+  name: string; // Question name
+  type: string; // Question type, e.g., "Multi Punch"
+  text: string; // Question text
+  parentBlocks: string[]; // e.g., ["subsection_follow_up"]
+  showLogic: LogicTextRepresentation;
+  terminateLogic: LogicTextRepresentation;
+  options: ConvertedOption[];
 }
