@@ -1,0 +1,54 @@
+{
+  "id": "sp",
+  "title": "SP Checklist",
+  "heading": "Survey Programming (SP) QA Checklist",
+  "description": "Select an exercise type below to view its specific QA rules.",
+  "categories": [
+    {
+      "subId": "sp-basics",
+      "title": "Basics & Logic",
+      "items": [
+        "<strong>Sections:</strong> Verify all sections are present (Screener, Main, Demographics, etc.).",
+        "<strong>Terminations:</strong> Check that all screener terminations work properly.",
+        "<strong>Qualifications:</strong> Check that any DVs holding qualifications punch correctly.",
+        "<strong>Logic:</strong> Check all skip/filter logic at the question or section level.",
+        "<strong>Quotas:</strong> Verify all quotas are built, punching correctly, and check Most Need/Least Filled.",
+        "<strong>Look and Feel:</strong> Graphics look good, no HTML visible, grids/tables correct."
+      ]
+    },
+    {
+      "subId": "sp-closed",
+      "title": "Closed & Open Ended",
+      "items": [
+        "<strong>Closed-Ended:</strong> Check single vs. multi-punch and randomization/default of response lists.",
+        "<strong>Closed-Ended:</strong> Verify 'other' stubs are anchored with a text-entry pop-up.",
+        "<strong>Open-Ended:</strong> Check 'other specify' usage, numerical ranges, and error messages for character limits.",
+        "<strong>Open-Ended:</strong> Check that sums of parts or shares between two questions add up correctly."
+      ]
+    },
+    {
+      "subId": "sp-iim",
+      "title": "IIM & PBS",
+      "items": [
+        "Check for logical mapping between items.",
+        "Flag if all items are matched to a single category incorrectly."
+      ]
+    },
+    {
+      "subId": "sp-dcm",
+      "title": "DCM / Conjoint",
+      "items": [
+        "Ensure the respondent didn't straight-line their choices.",
+        "Verify that dominant concepts were selected appropriately."
+      ]
+    },
+    {
+      "subId": "sp-media",
+      "title": "Media & Translation",
+      "items": [
+        "<strong>Media:</strong> Correct clips/images showing up, verify quality, ensure audio can be heard.",
+        "<strong>Translations:</strong> No English in question text, instructions, stubs, or errors. Verify no formatting is broken."
+      ]
+    }
+  ]
+}

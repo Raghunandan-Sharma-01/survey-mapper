@@ -1,65 +1,21 @@
 import { Node, Edge } from "reactflow";
-import dagre from "dagre";
 import { Question, QuestionLogic, SurveyBlock, LogicNode } from "../types/logic";
 
 const NODE_WIDTH = 250;
 const NODE_HEIGHT = 120;
 
 // ==========================================
-// 1. UTILITIES (The Upgraded Parent Extractor)
+// 1. UTILITIES
 // ==========================================
-
-export function extractClosestParentId(
-  logicNode: LogicNode | null | undefined,
-  rawLogicText: string | null | undefined,
-  validQuestionIds: string[],
-  currentIndex: number
-): string | null {
-  const rawIds = new Set<string>();
-
-  // 1. Try AST extraction first
-  function traverse(n: LogicNode) {
-    if (n.type === "leaf" && n.questionId) {
-      rawIds.add(n.questionId.toString());
-    } else if (n.type === "branch" && n.children) {
-      n.children.forEach(traverse);
-    }
-  }
-  if (logicNode) traverse(logicNode);
-
-  // 2. The Regex Safety Net: Scan raw text for known Question IDs
-  if (rawLogicText) {
-    validQuestionIds.forEach(id => {
-      // Escape the ID safely and look for it as a whole word
-      const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escapedId}\\b`, 'i');
-      if (regex.test(rawLogicText)) {
-        rawIds.add(id);
-      }
-    });
-  }
-
-  if (rawIds.size === 0) return null;
-
-  // 3. Find the LATEST valid parent (chronologically closest to the current node)
-  let closestIdx = -1;
-  let closestId: string | null = null;
-
-  rawIds.forEach(id => {
-    const idx = validQuestionIds.indexOf(id);
-    // Ensure the parent actually occurs BEFORE the current question in the survey
-    if (idx > closestIdx && idx < currentIndex) {
-      closestIdx = idx;
-      closestId = id;
-    }
-  });
-
-  return closestId;
-}
 
 function isNodeBranching(logicText: string | null): boolean {
   if (!logicText) return false;
   const lowerText = logicText.toLowerCase();
+  
+  if (lowerText.includes("show if") || lowerText.includes("ask if")) {
+    return true;
+  }
+  
   const isUnconditional = lowerText.includes("show to all");
   const isMasking = lowerText.includes("only show") || lowerText.match(/(rows|columns|stubs).*selected/);
   return !isUnconditional && !isMasking;
@@ -82,8 +38,16 @@ function buildNodes(
     const logic = logicMap[qId];
     
     const rawShowText = (logic as any)?.rawShowText || (typeof logic?.show === 'string' ? logic.show : null);
-    const finalLogicText = logic?.show && typeof logic.show !== 'string' ? readableCondition(logic.show) : rawShowText;
+    let finalLogicText = logic?.show && typeof logic.show !== 'string' ? readableCondition(logic.show) : rawShowText;
     const rawTermText = (logic as any)?.rawTerminateText || (typeof logic?.terminate === 'string' ? logic.terminate : null);
+
+    // Treat "Show to all" exactly like an empty node!
+    if (finalLogicText) {
+      const lowerText = finalLogicText.toLowerCase();
+      if (lowerText.includes("show to all") && !lowerText.includes("only show") && !lowerText.match(/(rows|columns|stubs).*selected/)) {
+        finalLogicText = null; 
+      }
+    }
 
     nodes.push({
       id: qId,
@@ -106,14 +70,16 @@ function buildNodes(
         type: "output",
         position: { x: 0, y: 0 },
         data: { label: "🛑 TERMINATE", logicText: rawTermText },
-        className: "bg-red-50 border border-red-500 text-red-700 text-xs w-[250px] text-left rounded shadow-sm z-10 p-2",
+        // Shrunk the width to 160px and centered the text
+        className: "bg-red-50 border border-red-500 text-red-700 text-xs w-[160px] text-center rounded shadow-sm z-10 p-2",
       });
       termEdges.push({
         id: `e-term-${qId}`,
         source: qId,
         target: `TERM-${qId}`,
         sourceHandle: "bottom-s", targetHandle: "top-t",
-        type: "smoothstep",
+        // Switched to 'step' so it draws a rigid, distinct 90-degree angle
+        type: "step",
         style: { stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "4 4" },
       });
     }
@@ -123,33 +89,166 @@ function buildNodes(
 }
 
 // ==========================================
-// 3. EDGE ROUTER (Upgraded)
+// 3. CUSTOM GRID/SNAKE & FAN-OUT ENGINE
 // ==========================================
 
-function buildRoutingEdges(
-  validQuestions: Question[], 
-  nodes: Node[], 
-  logicMap: Record<string, QuestionLogic>
-): Edge[] {
+function applyCustomLevelLayout(nodes: Node[]): Node[] {
+  const MAX_COLS = 5; 
+  const GAP_X = 80;
+  const GAP_Y = 160; 
+
+  const positionedNodes: Node[] = [];
+  const realNodes = nodes.filter(n => !n.id.startsWith("TERM-"));
+
+  interface Chunk {
+    logicText: string | null;
+    isSpine: boolean;
+    nodes: Node[];
+  }
+  const chunks: Chunk[] = [];
+  let currentChunk: Node[] = [];
+  let currentLogic = realNodes[0]?.data.logicText || null;
+  let currentIsSpine = !realNodes[0]?.data.isBranchingLogic;
+
+  realNodes.forEach(node => {
+    const nodeLogic = node.data.logicText || null;
+    const isSpine = !node.data.isBranchingLogic;
+
+    if (nodeLogic === currentLogic && isSpine === currentIsSpine) {
+      currentChunk.push(node);
+    } else {
+      chunks.push({ logicText: currentLogic, isSpine: currentIsSpine, nodes: currentChunk });
+      currentLogic = nodeLogic;
+      currentIsSpine = isSpine;
+      currentChunk = [node];
+    }
+  });
+  if (currentChunk.length > 0) chunks.push({ logicText: currentLogic, isSpine: currentIsSpine, nodes: currentChunk });
+
+  let globalY = 0;
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+
+    if (chunk.isSpine) {
+      // MAIN SPINE: Snake layout
+      const startX = 0; 
+      chunk.nodes.forEach((node, index) => {
+        const col = index % MAX_COLS;
+        const row = Math.floor(index / MAX_COLS);
+
+        node.position = {
+          x: startX + col * (NODE_WIDTH + GAP_X),
+          y: globalY + row * (NODE_HEIGHT + GAP_Y)
+        };
+        positionedNodes.push(node);
+      });
+
+      const totalRowsForChunk = Math.ceil(chunk.nodes.length / MAX_COLS);
+      globalY += totalRowsForChunk * (NODE_HEIGHT + GAP_Y);
+
+    } else {
+      // BRANCHES: Symmetrical Fan-Out
+      const branchChunks = [chunk];
+      while (i + 1 < chunks.length && !chunks[i+1].isSpine) {
+        branchChunks.push(chunks[i+1]);
+        i++; 
+      }
+
+      const numBranches = branchChunks.length;
+      const colWidth = NODE_WIDTH + GAP_X;
+      const totalWidth = numBranches * colWidth;
+      
+      const lastNode = positionedNodes.length > 0 ? positionedNodes[positionedNodes.length - 1] : null;
+      const spineCenterX = lastNode ? lastNode.position.x : 0;
+      
+      const startX = spineCenterX - (totalWidth / 2) + (colWidth / 2);
+      let maxBranchHeight = 0;
+
+      branchChunks.forEach((bChunk, bIndex) => {
+        const trackX = startX + bIndex * colWidth; 
+        
+        bChunk.nodes.forEach((node, nIndex) => {
+          node.position = {
+            x: trackX,
+            y: globalY + nIndex * (NODE_HEIGHT + GAP_Y) 
+          };
+          positionedNodes.push(node);
+        });
+        
+        maxBranchHeight = Math.max(maxBranchHeight, bChunk.nodes.length);
+      });
+
+      globalY += maxBranchHeight * (NODE_HEIGHT + GAP_Y);
+    }
+  }
+
+  const termNodes = nodes.filter(n => n.id.startsWith("TERM-"));
+  termNodes.forEach(term => {
+    const parentId = term.id.replace("TERM-", "");
+    const parentNode = positionedNodes.find(p => p.id === parentId);
+    
+    if (parentNode) {
+      term.position = {
+        // The center line drops at +125px. We place this at +140px so it perfectly dodges the blue lines!
+        x: parentNode.position.x + 140, 
+        y: parentNode.position.y + NODE_HEIGHT + 20 
+      };
+      positionedNodes.push(term);
+    }
+  });
+
+  return positionedNodes;
+}
+
+// ==========================================
+// 4. COORDINATE-AWARE EDGE ROUTER
+// ==========================================
+
+function buildRoutingEdges(validQuestions: Question[], positionedNodes: Node[]): Edge[] {
   const edges: Edge[] = [];
   const edgeSet = new Set<string>();
 
-  const safePushEdge = (edge: Edge) => {
-    const key = `${edge.source}->${edge.target}`;
-    if (!edgeSet.has(key)) {
-      edgeSet.add(key);
-      edges.push(edge);
+  // THE MAGIC: This dynamically chooses Top/Bottom or Left/Right handles based on grid positions!
+  const addEdge = (sourceId: string, targetId: string, typePrefix: string, style: any, animated = false) => {
+    const key = `${sourceId}->${targetId}`;
+    if (edgeSet.has(key)) return;
+    edgeSet.add(key);
+
+    const sNode = positionedNodes.find(n => n.id === sourceId);
+    const tNode = positionedNodes.find(n => n.id === targetId);
+
+    let sHandle = "right-s";
+    let tHandle = "left-t";
+
+    if (sNode && tNode) {
+      const dy = tNode.position.y - sNode.position.y;
+      // If the target node is strictly on a lower row (Branch split, or Snake wrap)
+      if (dy > 50) {
+        sHandle = "bottom-s";
+        tHandle = "top-t";
+      }
     }
+
+    edges.push({
+      id: `${typePrefix}-${sourceId}-${targetId}`,
+      source: sourceId,
+      target: targetId,
+      sourceHandle: sHandle,
+      targetHandle: tHandle,
+      type: "smoothstep",
+      animated,
+      style
+    });
   };
 
   let lastUnconditionalId: string | null = null;
   const activeTails = new Map<string, string>(); 
   let openBranches: string[] = []; 
-  const validIds = validQuestions.map(q => q.id.toString());
 
-  validQuestions.forEach((question, currentIndex) => {
+  validQuestions.forEach((question) => {
     const qId = question.id.toString();
-    const node = nodes.find(n => n.id === qId);
+    const node = positionedNodes.find(n => n.id === qId);
     if (!node) return;
 
     const isBranch = node.data.isBranchingLogic;
@@ -157,21 +256,11 @@ function buildRoutingEdges(
 
     if (!isBranch) {
       if (lastUnconditionalId) {
-        safePushEdge({
-          id: `seq-${lastUnconditionalId}-${qId}`,
-          source: lastUnconditionalId, target: qId,
-          sourceHandle: "right-s", targetHandle: "left-t",
-          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
-        });
+        addEdge(lastUnconditionalId, qId, "seq", { stroke: "#9ca3af", strokeWidth: 2 });
       }
 
       openBranches.forEach((tailId) => {
-        safePushEdge({
-          id: `merge-${tailId}-${qId}`,
-          source: tailId, target: qId,
-          sourceHandle: "right-s", targetHandle: "left-t",
-          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
-        });
+        addEdge(tailId, qId, "merge", { stroke: "#9ca3af", strokeWidth: 2 });
       });
 
       openBranches = []; 
@@ -181,41 +270,13 @@ function buildRoutingEdges(
     } else {
       if (activeTails.has(logicTxt)) {
         const tailId = activeTails.get(logicTxt)!;
-        safePushEdge({
-          id: `seq-${tailId}-${qId}`,
-          source: tailId, target: qId,
-          sourceHandle: "right-s", targetHandle: "left-t",
-          type: "smoothstep", style: { stroke: "#9ca3af", strokeWidth: 2 },
-        });
-        
+        addEdge(tailId, qId, "seq", { stroke: "#9ca3af", strokeWidth: 2 });
         activeTails.set(logicTxt, qId);
         openBranches = openBranches.filter(id => id !== tailId);
         openBranches.push(qId);
       } else {
-        // THE FIX: Use the new Closest Parent Extractor!
-        const closestParentId = extractClosestParentId(
-          logicMap[qId]?.show, 
-          logicTxt, 
-          validIds, 
-          currentIndex
-        );
-
-        if (closestParentId) {
-          safePushEdge({
-            id: `dep-${closestParentId}-${qId}`,
-            source: closestParentId, target: qId,
-            sourceHandle: "right-s", targetHandle: "left-t",
-            type: "smoothstep", animated: true,
-            style: { stroke: "#3b82f6", strokeWidth: 2 }, 
-          });
-        } else if (lastUnconditionalId) {
-          safePushEdge({
-            id: `fallback-${lastUnconditionalId}-${qId}`,
-            source: lastUnconditionalId, target: qId,
-            sourceHandle: "right-s", targetHandle: "left-t",
-            type: "smoothstep", animated: true,
-            style: { stroke: "#3b82f6", strokeWidth: 2, strokeDasharray: "5 5" },
-          });
+        if (lastUnconditionalId) {
+          addEdge(lastUnconditionalId, qId, "branch-start", { stroke: "#3b82f6", strokeWidth: 2 }, true);
         }
         activeTails.set(logicTxt, qId);
         openBranches.push(qId);
@@ -224,55 +285,6 @@ function buildRoutingEdges(
   });
 
   return edges;
-}
-
-// ==========================================
-// 4. LAYOUT ENGINE (Dagre)
-// ==========================================
-
-function applyDagreLayout(nodes: Node[], edges: Edge[]): Node[] {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: 'LR', ranksep: 100, nodesep: 60 });
-
-  nodes.forEach((node) => {
-    if (!node.id.startsWith("TERM-")) {
-      dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
-    }
-  });
-
-  edges.forEach((edge) => {
-    if (dagreGraph.hasNode(edge.source) && dagreGraph.hasNode(edge.target)) {
-      dagreGraph.setEdge(edge.source, edge.target);
-    }
-  });
-
-  dagre.layout(dagreGraph);
-
-  return nodes.map((node) => {
-    if (node.id.startsWith("TERM-")) {
-      const parentId = node.id.replace("TERM-", "");
-      const parentPos = dagreGraph.node(parentId);
-      if (parentPos) {
-        return {
-          ...node,
-          position: {
-            x: parentPos.x - NODE_WIDTH / 2, 
-            y: (parentPos.y - NODE_HEIGHT / 2) + NODE_HEIGHT + 15, 
-          },
-        };
-      }
-    }
-
-    const nodeWithPosition = dagreGraph.node(node.id);
-    return {
-      ...node,
-      position: {
-        x: nodeWithPosition.x - NODE_WIDTH / 2,
-        y: nodeWithPosition.y - NODE_HEIGHT / 2,
-      },
-    };
-  });
 }
 
 // ==========================================
@@ -312,7 +324,7 @@ function buildBoundingBoxes(layoutedNodes: Node[], validQuestions: Question[], b
       let prefix = '';
 
       if (block.type === 'Loop') {
-        padding = 20; 
+        padding = 25; 
         bgColor = 'rgba(255, 237, 213, 0.4)'; 
         borderColor = '#f97316';
         textColor = '#c2410c';
@@ -377,13 +389,18 @@ export function getLayoutedGraph(
   readableCondition: (node: LogicNode | null | undefined) => string
 ): { nodes: Node[]; edges: Edge[] } {
   
-  const validQuestions = refinedQuestions.filter(q => q.type !== "Structural Marker");
+  const validQuestions = refinedQuestions.filter(q => 
+    q.type !== "Structural Marker" && 
+    !(q.name || "").toLowerCase().includes("[hidden]")
+  );
 
   const { nodes, termEdges } = buildNodes(validQuestions, logicMap, readableCondition);
-  const routingEdges = buildRoutingEdges(validQuestions, nodes, logicMap);
   
+  // NOTE: Layout is now applied FIRST so the edges know exactly where they are drawing to!
+  const layoutedNodes = applyCustomLevelLayout(nodes);
+  
+  const routingEdges = buildRoutingEdges(validQuestions, layoutedNodes);
   const allEdges = [...termEdges, ...routingEdges];
-  const layoutedNodes = applyDagreLayout(nodes, allEdges);
 
   const boundingBoxes = buildBoundingBoxes(layoutedNodes, validQuestions, blocks);
 

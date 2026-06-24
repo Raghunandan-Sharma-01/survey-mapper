@@ -10,6 +10,9 @@ import {
   UploadHandlerCallbacks,
 } from "./utils/fileHandling/uploadHandler";
 
+// 1. Import the new QA Rules Viewer
+import QARulesViewer from "./components/Checklist/QARulesViewer"; 
+
 export default function App() {
   const {
     currentView,
@@ -22,6 +25,9 @@ export default function App() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 2. Add a local state to handle toggling the QA View independently of the main graph/editor views
+  const [showQARules, setShowQARules] = useState(false);
 
   /**
    * Handles file input change event and processes the file
@@ -55,18 +61,39 @@ export default function App() {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100 font-sans">
-      <header className="px-6 h-15 bg-white text-gray-900 flex justify-between items-center shadow-md z-10">
+      <header className="px-6 py-3 h-16 bg-white text-gray-900 flex justify-between items-center shadow-md z-10">
         <HeaderUploadSection
           isLoading={isLoading}
           error={error}
           onFileChange={handleFileInputChange}
         />
 
-        <HeaderNavigationButtons currentView={currentView} onViewChange={setView} />
+        {/* 3. Group the navigation buttons together */}
+        <div className="flex items-center gap-4">
+          
+          {/* QA Rules Toggle Button */}
+          <button
+            onClick={() => setShowQARules(!showQARules)}
+            className={`px-4 py-2 font-bold text-sm rounded-md transition-colors ${
+              showQARules 
+                ? "bg-blue-100 text-blue-700 shadow-inner" 
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            {showQARules ? "Close QA Rules" : "View QA Rules"}
+          </button>
+          
+          <HeaderNavigationButtons currentView={currentView} onViewChange={setView} />
+        </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {currentView === "editor" ? (
+        {/* 4. Conditionally render QA Rules, or fall back to your normal views */}
+        {showQARules ? (
+          <div className="w-full h-full overflow-y-auto bg-slate-50">
+            <QARulesViewer />
+          </div>
+        ) : currentView === "editor" ? (
           <div className="flex w-full">
             {shouldShowConvertedQuestionsView ? (
               <ConvertedQuestionsView questions={convertedQuestions} />

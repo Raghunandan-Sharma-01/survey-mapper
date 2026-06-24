@@ -25,7 +25,8 @@ const LogicMap = () => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        fitView
+        // fitView
+        defaultViewport={{ x: 100, y: 50, zoom: 0.9 }}
         minZoom={0.2}
         maxZoom={1.5}
         defaultEdgeOptions={defaultEdgeOptions}
