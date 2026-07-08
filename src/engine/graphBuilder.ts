@@ -21,4 +21,4 @@ export function buildGraphLevelLayout(
 }
 
 // Export utilities
-export { calculateAllPaths } from "./pathCalculator";
+// `calculateAllPaths` was removed as it's not referenced elsewhere.

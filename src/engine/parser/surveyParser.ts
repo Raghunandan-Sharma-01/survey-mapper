@@ -1,4 +1,4 @@
-import { Question, SurveyBlock, BlockType } from "../types/logic";
+import { Question, SurveyBlock, BlockType } from "../../types/logic";
 import _ from "lodash";
 
 export function parseSurveyData(rawData: any) {
