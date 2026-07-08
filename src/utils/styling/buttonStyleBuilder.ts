@@ -26,5 +26,5 @@ export function buildFileInputLabelClass(isLoading: boolean): string {
  * Gets the label text for upload button
  */
 export function getUploadButtonLabel(isLoading: boolean): string {
-  return isLoading ? "Converting..." : "Upload (JSON/DOCX)";
+  return isLoading ? "Converting..." : "Upload DOCX";
 }

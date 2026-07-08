@@ -1,4 +1,3 @@
-import React from "react";
 import { ConvertedQuestion } from "../../types/logic";
 
 interface ConvertedQuestionsViewProps {

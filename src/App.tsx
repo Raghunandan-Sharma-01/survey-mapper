@@ -17,7 +17,6 @@ export default function App() {
   const {
     currentView,
     setView,
-    setSurveyData,
     setConvertedQuestions,
     refinedQuestions,
     convertedQuestions,
@@ -41,13 +40,6 @@ export default function App() {
     const file = files[0];
 
     const uploadCallbacks: UploadHandlerCallbacks = {
-      onJsonParsed: ({ convertedFormat, payload }) => {
-        if (convertedFormat) {
-          setConvertedQuestions(payload);
-        } else {
-          setSurveyData(payload);
-        }
-      },
       onDocxConverted: (questions) => setConvertedQuestions(questions),
       onError: setError,
       onLoadingChange: setIsLoading,
@@ -90,7 +82,7 @@ export default function App() {
       <main className="flex-1 flex overflow-hidden">
         {/* 4. Conditionally render QA Rules, or fall back to your normal views */}
         {showQARules ? (
-          <div className="w-full h-full overflow-y-auto bg-slate-50">
+          <div className="w-full h-full overflow-hidden bg-slate-50">
             <QARulesViewer />
           </div>
         ) : currentView === "editor" ? (

@@ -4,7 +4,7 @@
  */
 
 import { ConvertedQuestion } from "../../types/logic";
-import { stripInstructionsFromText, getInstructionsToStrip } from "./instructionStripper";
+import { stripInstructionsFromText } from "./instructionStripper";
 import { cleanSquashedLogicText, extractMissingOptionsFromSquashedLogic } from "../htmlParsing/logicExtractor";
 import { looksLikeQuestionText } from "../htmlParsing/htmlElementProcessor";
 

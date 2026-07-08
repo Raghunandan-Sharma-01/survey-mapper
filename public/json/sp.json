@@ -9,10 +9,12 @@
       "title": "Basics & Logic",
       "items": [
         "<strong>Sections:</strong> Verify all sections are present (Screener, Main, Demographics, etc.).",
-        "<strong>Terminations:</strong> Check that all screener terminations work properly.",
+        "<strong>Terminations:</strong> Check if all screener terminations work properly.",
         "<strong>Qualifications:</strong> Check that any DVs holding qualifications punch correctly.",
+        "<strong>QC Flag:</strong> Ensure all QC flags are properly placed and functioning.",
         "<strong>Logic:</strong> Check all skip/filter logic at the question or section level.",
         "<strong>Quotas:</strong> Verify all quotas are built, punching correctly, and check Most Need/Least Filled.",
+        "<strong>Assigners:</strong> Check that the assigner is working based on Web Author specifications (or whatever document is the source of truth).",
         "<strong>Look and Feel:</strong> Graphics look good, no HTML visible, grids/tables correct."
       ]
     },
@@ -22,24 +24,27 @@
       "items": [
         "<strong>Closed-Ended:</strong> Check single vs. multi-punch and randomization/default of response lists.",
         "<strong>Closed-Ended:</strong> Verify 'other' stubs are anchored with a text-entry pop-up.",
+        "<strong>Closed-Ended:</strong> If there is stub-level logic, check that logic is working correctly and stub groupings are correct.",
+        "<strong>Closed-Ended:</strong> Any 'other' stubs are anchored and have a text-entry pop-up when selected",
+"<strong>Closed-Ended:</strong> Type in response to 'other' pop-ups to make sure it's piped through correctly later in the survey (if that's what logic says should happen)",
+"<strong>CLosed-Ended:</strong> Check that all inserts and custom validations are working correctly.",
         "<strong>Open-Ended:</strong> Check 'other specify' usage, numerical ranges, and error messages for character limits.",
         "<strong>Open-Ended:</strong> Check that sums of parts or shares between two questions add up correctly."
       ]
     },
     {
-      "subId": "sp-iim",
-      "title": "IIM & PBS",
+      "subId": "sp-special",
+      "title": "Special Exercises",
       "items": [
-        "Check for logical mapping between items.",
-        "Flag if all items are matched to a single category incorrectly."
-      ]
-    },
-    {
-      "subId": "sp-dcm",
-      "title": "DCM / Conjoint",
-      "items": [
-        "Ensure the respondent didn't straight-line their choices.",
-        "Verify that dominant concepts were selected appropriately."
+        "<strong>IIM:</strong>Check if images are not broken or inside a circle.",
+        "<strong>DCM / Coinjoint:</strong> Ensure the respondent stubs are mapped to the correct concepts.",
+        "<strong>DCM / Coinjoint:</strong> Check that the correct number of stubs are being displayed in each concept.",
+        "<strong>Typing Tool:</strong> Check that the typing tool is working correctly against the logic provided in excel.",
+        "<strong>Polars:</strong> Check that the bipolar scale is displayed correctly.",
+        "<strong>Polars:</strong> Check if scales are randomized or default (column should be default, rows can be both).",
+        "<strong>Highlighter:</strong> Check that the highlighter is working correctly and that the correct highlighter is being used for the exercise type.",
+        "<strong>MaxDiff:</strong> Check that the max diff is working correctly, including the follow up questions.",
+        "<strong>MaxDiff:</strong> Check if all the flags are punching correctly."
       ]
     },
     {

@@ -1,15 +1,16 @@
 import { LogicNode, ComparisonOperator } from "../../types/logic";
+import { isShowToAll, isMaskingLogic } from "../logicHelpers";
 
 /**
  * Translates English raw text into a machine-readable Abstract Syntax Tree (AST)
  */
 export function parseTextToLogicNode(text: string | null): LogicNode | null {
   if (!text) return null;
-  if (/show to all/i.test(text)) return null;
+  if (isShowToAll(text)) return null;
 
   // Catch Masking Logic (Stub/Row filters) and abort structural routing
-  if (/only show/i.test(text) || /(rows|columns|stubs).*selected/i.test(text)) {
-    return null; 
+  if (isMaskingLogic(text)) {
+    return null;
   }
 
   // THE FIX: Use .*? to absorb variations like "at least 1 from codes"

@@ -20,6 +20,18 @@ export function parseSurveyData(rawData: any) {
   const activeStack: SurveyBlock[] = [];
 
   allElements.forEach((element, index) => {
+    // Guard against malformed uploaded data: skip anything that isn't a
+    // well-formed element with a string `type` and a defined `id`.
+    if (
+      !element ||
+      typeof element !== "object" ||
+      typeof element.type !== "string" ||
+      element.id === undefined ||
+      element.id === null
+    ) {
+      return;
+    }
+
     if (element.type.endsWith("Start")) {
       const baseType = element.type.replace("Start", "") as BlockType;
       const blockId = `${baseType.toLowerCase()}_${element.id}`;

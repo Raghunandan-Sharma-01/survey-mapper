@@ -11,10 +11,3 @@ export function isDocxFile(file: File): boolean {
     file.name.toLowerCase().endsWith(DOCX_EXTENSION)
   );
 }
-
-export function isJsonFile(file: File): boolean {
-  return (
-    file.type === "application/json" ||
-    file.name.toLowerCase().endsWith(".json")
-  );
-}

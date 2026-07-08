@@ -6,21 +6,30 @@
   "categories": [
     {
       "subId": "dp-overall",
-      "title": "Overall Checks",
+      "title": "Overall",
       "items": [
-        "Ensure all tables in specs are accounted for in the tables file vs. DA.",
-        "Confirm correct tables are being run for each banner and in the correct order.",
-        "Verify Final Data matches Excel Tabs export and custom DVs are built correctly."
+        "All tables in specs are accounted for in the tables file vs DA.",
+        "If specific tables are needed for each banner, confirm correct tables are being run for each banner.",
+        "Tables are in the correct order (based on DA).",
+        "Final Data in R matches Excel Tabs export.",
+        "Any custom DVs are built correctly."
       ]
     },
     {
       "subId": "dp-tables",
-      "title": "Table Specifics",
+      "title": "Each Table",
       "items": [
-        "Check table title and base description match specs.",
-        "For single-punch, ensure data sums to total. For multi-punch, sums to > total.",
-        "For numerics, verify correct calculations are included and logically make sense.",
-        "Verify weighting is properly applied or not applied."
+        "Table title matches specs and spelled correctly.",
+        "Base description matches specs and spelled correctly.",
+        "All categories are showing in table as per specs and spelled correctly.",
+        "Check that all stubs are present, in the correct order, and spelled correctly.",
+        "For single-punch variables, make sure that data sums to total.",
+        "For multi-punch variables, make sure that data sums to more than total.",
+        "For numerics, make sure the correct calculations are included (and make sense - e.g., does the mean seem too high or low?).",
+        "Nets created as per specs and spelled correctly.",
+        "Bases on tables are matching specs based on counts (e.g., based to total vs based to subset).",
+        "Weighting is applied or not applied correctly.",
+        "Summary Tables are pulling in the correct rows (e.g., Summary of TB should only be pulling in TB)."
       ]
     },
     {
@@ -28,16 +37,21 @@
       "title": "Banners & Stat Testing",
       "items": [
         "Banner labels match specs and are spelled correctly.",
+        "Banner cell values checked against spec/counts.",
         "Stat testing letters line up with the correct banner cell (don't include Total cell).",
-        "Stat testing columns match specs."
+        "Stat testing columns match specs.",
+        "Confirm stat testing requested makes sense with the columns and banner set-up."
       ]
     },
     {
       "subId": "dp-edge",
       "title": "Edge Cases",
       "items": [
-        "Check for labels, specs, or tables that don't make sense and flag for clarification.",
-        "Remember that Rapid Choice and IIM Bases may not match base specs because cleaning is done in DP."
+        "Are there labels/specs/tables that don't make sense that we would want to go back to the team for clarification?",
+        "If there are tables or banner cells that use non-completes, make sure all the rest of the tables/banner cells are correctly filtered to Completes.",
+        "Do the Table Titles make sense with Base Descriptions?",
+        "This is in case tables were copied in set-up but titles or bases not updated.",
+        "Remember that Rapid Choice and IIM Bases may not match the base spec because cleaning is done in data processing."
       ]
     }
   ]

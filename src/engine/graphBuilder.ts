@@ -1,6 +1,6 @@
 import { Node, Edge } from "reactflow";
 import { Question, QuestionLogic, SurveyBlock, LogicNode } from "../types/logic";
-import { getLayoutedGraph } from "./layoutCalculator";
+import { getLayoutedGraph } from "./layout/getLayoutedGraph";
 
 export function buildGraphLevelLayout(
   refinedQuestions: Question[],
