@@ -1,0 +1,9 @@
+{
+  "id": "datascan",
+  "title": "Data Scan",
+  "heading": "Data Scan Rules",
+  "description": "Rules and guidelines for scanning live data.",
+  "items": [
+    "<em>Data scan rules will be populated here in the future.</em>"
+  ]
+}
