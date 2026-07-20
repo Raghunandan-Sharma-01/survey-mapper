@@ -12,6 +12,8 @@ import {
 
 // 1. Import the new QA Rules Viewer
 import QARulesViewer from "./components/Checklist/QARulesViewer"; 
+import CardGrid from "./components/CardGrid";
+import { niceScroll } from "./utils/ui";
 
 export default function App() {
   const {
@@ -51,6 +53,41 @@ export default function App() {
 
   const shouldShowConvertedQuestionsView = convertedQuestions.length > 0;
 
+function renderBody() {
+  if (showQARules) {
+    return (
+      <div className="w-full h-full overflow-hidden bg-slate-50">
+        <QARulesViewer />
+      </div>
+    );
+  }
+  if (currentView === "map") {
+    return (
+      <div className="flex-1 relative">
+        <LogicMap />
+      </div>
+    );
+  }
+  // editor view
+  if (!shouldShowConvertedQuestionsView) {
+    return (
+      <div className="flex w-full h-full">
+        <QuestionnaireSidebar questions={refinedQuestions} />
+      </div>
+    );
+  }
+  return (
+    <div className="flex w-full h-full">
+      <div className={`w-2/3 h-full overflow-y-auto ${niceScroll}`}>
+        <ConvertedQuestionsView questions={convertedQuestions} />
+      </div>
+      <div className="w-1/3 h-full border-l border-slate-200 overflow-hidden">
+        <CardGrid questions={convertedQuestions} />
+      </div>
+    </div>
+  );
+}
+
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100 font-sans">
       <header className="px-6 py-3 h-16 bg-white text-gray-900 flex justify-between items-center shadow-md z-10">
@@ -79,26 +116,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
-        {/* 4. Conditionally render QA Rules, or fall back to your normal views */}
-        {showQARules ? (
-          <div className="w-full h-full overflow-hidden bg-slate-50">
-            <QARulesViewer />
-          </div>
-        ) : currentView === "editor" ? (
-          <div className="flex w-full">
-            {shouldShowConvertedQuestionsView ? (
-              <ConvertedQuestionsView questions={convertedQuestions} />
-            ) : (
-              <QuestionnaireSidebar questions={refinedQuestions} />
-            )}
-          </div>
-        ) : (
-          <div className="flex-1 relative">
-            <LogicMap />
-          </div>
-        )}
-      </main>
+      <main className="flex-1 flex overflow-hidden">{renderBody()}</main>
     </div>
   );
 }

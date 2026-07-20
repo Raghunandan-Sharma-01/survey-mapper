@@ -14,7 +14,12 @@ export function isShowToAll(logicText: string | null | undefined): boolean {
 
 export function isMaskingLogic(logicText: string | null | undefined): boolean {
   if (!logicText) return false;
-  return /only show/i.test(logicText) || /(rows|columns|stubs).*selected/i.test(logicText);
+  return (
+    /only show/i.test(logicText) ||
+    /(rows|columns|stubs).*selected/i.test(logicText) ||
+    /\blimit\b[\s\S]*\boptions?\b/i.test(logicText) ||
+    /\b(at\s?most|up\s?to)\b[\s\S]*\boptions?\b/i.test(logicText)
+  );
 }
 
 export function stripProgrammerComment(
@@ -23,8 +28,14 @@ export function stripProgrammerComment(
   if (!text) return null;
   const cleaned = text
     .split("\n")
-    .map((line) => line.replace(/programmer\s*comment.*$/i, "").trim())
+    .map((line) =>
+      line
+        .replace(/programmer\s*comment.*$/i, "")
+        .replace(/note to client.*$/i, "")
+        .trim()
+    )
     .filter((line) => line.length > 0)
+    .filter((line) => !isMaskingLogic(line))
     .join("\n")
     .replace(/[ \t]{2,}/g, " ")
     .trim();

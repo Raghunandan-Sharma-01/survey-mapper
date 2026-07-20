@@ -46,7 +46,6 @@ interface SurveyStore {
   nodes: Node[];
   edges: Edge[];
 
-  // 1. ADD THESE BACK TO THE INTERFACE
   currentView: "editor" | "map";
   setView: (view: "editor" | "map") => void;
 

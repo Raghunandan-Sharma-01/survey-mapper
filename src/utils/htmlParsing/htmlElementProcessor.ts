@@ -29,7 +29,7 @@ export function removeNameFromText(text: string): string {
  */
 export function tokenizeText(text: string): string[] {
   return text
-    .split(/(?=-\s*)|(?<=\.)/) // Split by lookahead hyphen or lookbehind period
+    .split(/(?<=\.)|(?=\s-\s)/) // Split by lookahead hyphen or lookbehind period
     .map((p) => p.trim())
     .filter((p) => p);
 }
@@ -104,9 +104,15 @@ export function isQuestionIdPart(part: string): boolean {
  * Determines question type from row text
  */
 export function determineQuestionTypeFromText(rowText: string): string {
-  const lowerText = rowText.toLowerCase();
-  if (lowerText.includes("select one")) return "Single Choice";
-  if (lowerText.includes("select all") || lowerText.includes("select max")) return "Multi Punch";
-  if (lowerText.includes("enter your response") || lowerText.includes("numeric")) return "Open Ended";
+  const t = rowText.toLowerCase();
+  if (/\bnumeric\b|integer|enter (a )?number|whole number/.test(t)) return "Numeric";
+  if (t.includes("select one")) return "Single Choice";
+  if (t.includes("select all") || t.includes("select max") || t.includes("select up to")) return "Multi Punch";
+  if (t.includes("enter your response") || t.includes("open")) return "Open Ended";
   return "Multiple Choice";
+}
+
+/** A grid instruction implies rows x columns ("... for each", "... in each row"). */
+export function isGridInstruction(rowText: string): boolean {
+  return /\bfor each\b|\bin each\b|each row|each column/i.test(rowText);
 }

@@ -4,50 +4,38 @@
  */
 
 import { ParsingState, tokenizeText, isQuestionIdPart } from "./htmlElementProcessor";
+import { isMaskingLogic } from "../logicHelpers";
 
-/**
- * Processes paragraph element and extracts logic statements
- */
-export function processParagraphElement(
-  el: Element,
-  state: ParsingState,
-): void {
+const appendLine = (existing: string, line: string) =>
+  existing ? existing + "\n" + line : line;
+
+export function processParagraphElement(el: Element, state: ParsingState): void {
   let text = el.textContent?.trim() || "";
   if (!text) return;
 
-  // Extract name if present
-  const nameMatch = text.match(/\[([^\]]+)\]/);
+  // FIX: only a LEADING [Name] (e.g. "[Gender]"), never an inline code like "[1]".
+  const nameMatch = text.match(/^\s*\[([^\]]+)\]/);
   if (nameMatch) {
     state.pendingName = nameMatch[1];
-    state.pendingShow = ""; 
+    state.pendingShow = "";
     state.pendingTerminate = "";
-    
     text = text.replace(nameMatch[0], "").trim();
   }
 
-  // Tokenize by lookahead hyphen or lookbehind period
   const parts = tokenizeText(text);
-
-  for (let part of parts) {
-    if (isQuestionIdPart(part)) {
-      break;
-    }
-
-    let cleanPart = part.replace(/^-\s*/, "").trim();
+  for (const part of parts) {
+    if (isQuestionIdPart(part)) break;
+    const cleanPart = part.replace(/^-\s*/, "").trim();
+    if (!cleanPart) continue;
     const lower = cleanPart.toLowerCase();
 
     if (/^(show|if)\b/i.test(lower)) {
-      state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
+      if (isMaskingLogic(cleanPart)) continue; // skip stub caps / masking
+      state.pendingShow = appendLine(state.pendingShow, cleanPart);
     } else if (/^(terminate|delay)\b/i.test(lower)) {
-      state.pendingTerminate = (state.pendingTerminate ? state.pendingTerminate + "\n" : "") + cleanPart;
-    // FIX: Catch modifiers, masking logic, and comments so they aren't thrown away!
-    } else if (
-      /^(programmer comment|only show|hide)\b/i.test(lower) ||
-      lower.includes("qcflag") ||
-      /(rows|columns|stubs).*selected/i.test(lower)
-    ) {
-      state.pendingShow = (state.pendingShow ? state.pendingShow + "\n" : "") + cleanPart;
+      state.pendingTerminate = appendLine(state.pendingTerminate, cleanPart);
     }
+    // masking / "only show" / "hide" / qcflag lines are intentionally dropped.
   }
 }
 

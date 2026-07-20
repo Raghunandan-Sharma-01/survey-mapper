@@ -9,6 +9,7 @@ import {
   isOptionMarker,
   looksLikeQuestionText,
   determineQuestionTypeFromText,
+  isGridInstruction,
 } from "./htmlElementProcessor";
 
 /**
@@ -33,15 +34,25 @@ export function processOptionRow(
     }
     return; // Exit early, we handled it!
   }
+// Grid column-header row: a "COLS:"/"ROWS:" metadata cell followed by the
+  // column labels. Column ids align to the per-column codes in the data rows (1..n).
+  if (/^(COLS:|ROWS:)/i.test(row[0]?.trim() || "")) {
+    const headers = row.slice(1).map((c) => c.trim()).filter((c) => c !== "");
+    if (headers.length > 0) {
+      currentQuestion.isGrid = true;
+      currentQuestion.columns = headers.map((t, i) => ({ id: String(i + 1), text: t }));
+    }
+    return;
+  }
 
   // Ignore metadata rows
   if (isMetadataRow(rowText)) return;
 
   // Determine question type from row and update current question
   const questionType = determineQuestionTypeFromText(rowText);
-  if (questionType !== "Multiple Choice") {
-    currentQuestion.type = questionType;
-  }
+  if (questionType !== "Multiple Choice") currentQuestion.type = questionType;
+  // Grid-ness is orthogonal to response type (single / multi / numeric grid).
+  if (isGridInstruction(rowText)) currentQuestion.isGrid = true;
 
   // Check for multi-column option format
   const codeIndex = row.findIndex((c) => isOptionMarker(c));

@@ -148,5 +148,7 @@ export interface ConvertedQuestion {
   parentBlocks: string[]; // e.g., ["subsection_follow_up"]
   showLogic: LogicTextRepresentation;
   terminateLogic: LogicTextRepresentation;
-  options: ConvertedOption[];
+  options: ConvertedOption[]; // for grids, these are the ROW stubs
+  isGrid?: boolean;
+  columns?: { id: string; text: string }[];
 }
