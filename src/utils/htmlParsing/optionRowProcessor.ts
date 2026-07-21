@@ -7,7 +7,6 @@ import { ConvertedQuestion } from "../../types/logic";
 import {
   isMetadataRow,
   isOptionMarker,
-  looksLikeQuestionText,
   determineQuestionTypeFromText,
   isGridInstruction,
 } from "./htmlElementProcessor";
@@ -25,14 +24,14 @@ export function processOptionRow(
   // --- THE LOOKBACK CATCH ---
   // If this row is JUST an exclusive/anchor modifier, apply it to the previous option
   const upperRowText = rowText.toUpperCase();
-  if (/^(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?$/.test(upperRowText)) {
+  if (/^((?:EXCLUSIVE|ANCHOR|ALWAYS SHOWN)[.\s]*)+$/.test(upperRowText)) {
     const lastOption = currentQuestion.options[currentQuestion.options.length - 1];
     if (lastOption) {
       if (upperRowText.includes("EXCLUSIVE")) lastOption.isExclusive = true;
       if (upperRowText.includes("ANCHOR")) lastOption.isAnchor = true;
       if (upperRowText.includes("ALWAYS SHOWN")) lastOption.isAlwaysShown = true;
     }
-    return; // Exit early, we handled it!
+    return;
   }
 // Grid column-header row: a "COLS:"/"ROWS:" metadata cell followed by the
   // column labels. Column ids align to the per-column codes in the data rows (1..n).
@@ -61,13 +60,11 @@ export function processOptionRow(
   // Grid-ness is orthogonal to response type (single / multi / numeric grid).
   if (isGridInstruction(rowText)) currentQuestion.isGrid = true;
 
-  // Check for multi-column option format
+  // Check for multi-column option format. A leading option marker ("1.", "a.")
+  // is proof this is a stub, so we do NOT defer to looksLikeQuestionText here —
+  // that wrongly sent long stubs (with parenthetical examples) into the question text.
   const codeIndex = row.findIndex((c) => isOptionMarker(c));
-  if (
-    codeIndex !== -1 &&
-    row[codeIndex + 1] &&
-    !looksLikeQuestionText(row[codeIndex + 1])
-  ) {
+  if (codeIndex !== -1 && row[codeIndex + 1]) {
     parseOptionMultiColumn(row, codeIndex, currentQuestion);
     return;
   }
@@ -102,10 +99,10 @@ function parseOptionMultiColumn(
     .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
     .trim();
 
-  if (looksLikeQuestionText(cleanOptText)) {
-    currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
-    return;
-  }
+  // if (looksLikeQuestionText(cleanOptText)) {
+  //   currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
+  //   return;
+  // }
 
   currentQuestion.options.push({
     id: row[codeIndex].replace(/[.:]$/, ""),
@@ -142,10 +139,10 @@ function parseOptionCombined(
       .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
       .trim();
 
-    if (looksLikeQuestionText(cleanOptText)) {
-      currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
-      return;
-    }
+    // if (looksLikeQuestionText(cleanOptText)) {
+    //   currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
+    //   return;
+    // }
 
     // 3. Push the new object
     currentQuestion.options.push({

@@ -36,7 +36,11 @@ export function getFlowAxis(): FlowAxis {
     busHandles: { s: "b", t: "t" },
     tapHandles: { s: "r", t: "l" },
     spineLen: (it) => spineHeight(it),
-  groupLen: (its, open) => (open ? 24 + Math.ceil(its.length / 2) * 54 + 12 : 34),
+  groupLen: (its, open) => {
+    if (!open) return 34;                       // collapsed pill
+    const rows = Math.ceil(its.length / 2);     // 2-column grid
+    return 30 + rows * 64 + 12;                 // header + generous row height + padding
+  },
     posSpine: (a) => ({ x: SPINE_X, y: a }),
     posBranch: (a) => ({ x: BRANCH_X, y: a }),
     posAnchor: (a, len) => ({ x: BUS, y: a + len / 2 }),

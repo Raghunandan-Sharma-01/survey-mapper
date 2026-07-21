@@ -34,6 +34,14 @@ export function parseHtmlToQuestions(html: string): ConvertedQuestion[] {
     
     // 2. IMPORTANT: Ignore the Table of Contents! (TOC items have href links to anchors)
     const isTOC = el.querySelector("a[href^='#']");
+    if (
+      (tagName === "p" || tagName.match(/^h[1-6]$/)) &&
+      !isTOC &&
+      /^(qc\s*flags|appendix\b|logic\s*rule\s*descriptions)\b/i.test(text)
+    ) {
+      if (currentQuestion) { questions.push(currentQuestion); currentQuestion = null; }
+      break;
+    }
 
     if ((tagName === "p" || tagName.match(/^h[1-6]$/)) && isStructuralMarker && !isTOC) {
       // Push any open table question first

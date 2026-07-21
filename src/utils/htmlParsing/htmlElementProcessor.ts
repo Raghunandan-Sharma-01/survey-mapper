@@ -55,7 +55,7 @@ export function looksLikeQuestionRow(row: string[]): boolean {
  * Checks if a cell is a metadata row (instructions, settings)
  */
 export function isMetadataRow(rowText: string): boolean {
-  return /^(DEFAULT ORDER|RANDOMIZE LIST|COLS:|ROWS:|EXCLUSIVE|ANCHOR)/.test(rowText);
+  return /^(DEFAULT ORDER|RANDOMIZE|COLS:|ROWS:|EXCLUSIVE|ANCHOR|ALWAYS SHOWN)/.test(rowText);
 }
 
 /**
