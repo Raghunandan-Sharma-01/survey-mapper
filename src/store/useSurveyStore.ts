@@ -6,37 +6,15 @@ import {
   QuestionLogic,
   LoopBlock,
   SurveyBlock,
-  BlockType,
   ConvertedQuestion,
 } from "../types/logic";
-import { buildGraphLevelLayout } from "../engine/graphBuilder";
-import { readableCondition } from "../utils/logicHelpers";
-import { parseSurveyData } from "../engine/parser/surveyParser";
-import {
-  buildSourceQuestions,
-  adaptQuestions,
-  resolveLogicMap,
-} from "./helpers/surveyFlowHelpers";
-import {
-  buildLogicTracks,
-  buildLinearPaths,
-  deduplicatePaths,
-  pruneSubsetPaths,
-} from "./helpers/surveyPathHelpers";
+import { buildFlowLayout, FilterChip } from "../engine/flow/buildFlowLayout";
 
 /**
  * A question from either source: parsed survey JSON (Question) or a converted
  * document (ConvertedQuestion). Only ConvertedQuestion carries showLogic /
  * terminateLogic, so access is narrowed through the helpers below.
  */
-type SourceQuestion = Question | ConvertedQuestion;
-
-const getShowText = (q: SourceQuestion | undefined): string | null =>
-  q && "showLogic" in q ? q.showLogic?.text ?? null : null;
-
-const getTerminateText = (q: SourceQuestion | undefined): string | null =>
-  q && "terminateLogic" in q ? q.terminateLogic?.text ?? null : null;
-
 interface SurveyStore {
   data: any[];
   refinedQuestions: Question[];
@@ -49,7 +27,6 @@ interface SurveyStore {
   currentView: "editor" | "map";
   setView: (view: "editor" | "map") => void;
 
-  setSurveyData: (data: any[]) => void;
   setConvertedQuestions: (questions: ConvertedQuestion[]) => void; // For document uploads
   updateLogic: (id: string, logic: Partial<QuestionLogic>) => void;
   getFlowElements: () => void;
@@ -59,6 +36,17 @@ interface SurveyStore {
   setActivePath: (index: number | null) => void;
 
   blocks: Record<string, SurveyBlock>;
+  direction: "vertical" | "horizontal";
+  chips: FilterChip[];
+  filter: string[];
+  toggleFilter: (key: string) => void;
+  clearFilter: () => void;
+  applyFilter: () => void;
+  layoutVersion: number; 
+
+  expanded: Record<string, boolean>;
+  rebuildGraph: () => void;
+  toggleExpand: (id: string) => void;
 }
 
 export const useSurveyStore = create<SurveyStore>()(
@@ -70,8 +58,12 @@ export const useSurveyStore = create<SurveyStore>()(
     loopBlocks: [],
     nodes: [],
     edges: [],
+    chips: [],
+    filter: {},
     paths: [],
     activePathIndex: null,
+    layoutVersion: 0,
+    expanded: {},
 
     // 2. ADD THE INITIAL STATE
     currentView: "editor",
@@ -85,24 +77,10 @@ export const useSurveyStore = create<SurveyStore>()(
       }
     },
 
-    setSurveyData: (rawData) => {
-      const { refinedQuestions, blocks } = parseSurveyData(rawData);
-      set({
-        data: rawData,
-        refinedQuestions,
-        blocks,
-        logicMap: {},
-      });
-      get().getFlowElements();
-    },
-
     setConvertedQuestions: (questions) => {
-      set({
-        convertedQuestions: questions,
-        currentView: "editor",
-      });
-      get().getFlowElements();
-    },
+  set({ convertedQuestions: questions, currentView: "editor", expanded: {}, filter: [] });
+  get().getFlowElements();
+},
 
     updateLogic: (id, logic) => {
       set((state) => ({
@@ -154,37 +132,24 @@ export const useSurveyStore = create<SurveyStore>()(
       });
     },
 
-    getFlowElements: () => {
-      const { refinedQuestions, convertedQuestions, logicMap, blocks } = get();
-      const sourceQuestions: SourceQuestion[] =
-        refinedQuestions.length > 0 ? refinedQuestions : convertedQuestions;
-
-      if (sourceQuestions.length === 0) return;
-
-      const { dynamicBlocks, processedQuestions } = buildSourceQuestions(
-        sourceQuestions,
-        blocks
-      );
-      const mappedQuestions = adaptQuestions(processedQuestions);
-      const resolvedLogicMap = resolveLogicMap(
-        mappedQuestions,
-        processedQuestions,
-        logicMap
-      );
-
-      const { nodes, edges } = buildGraphLevelLayout(
-        mappedQuestions,
-        resolvedLogicMap,
-        dynamicBlocks,
-        readableCondition
-      );
-
-      const { pathableNodes, uniqueLogicTracks } = buildLogicTracks(nodes);
-      const linearPaths = buildLinearPaths(pathableNodes, uniqueLogicTracks);
-      let deduplicatedPaths = deduplicatePaths(linearPaths);
-      deduplicatedPaths = pruneSubsetPaths(deduplicatedPaths);
-
-      set({ nodes, edges, paths: deduplicatedPaths });
-    },
+    rebuildGraph: () => {
+  const { convertedQuestions, expanded } = get();
+  if (!convertedQuestions.length) return;
+  const { nodes, edges, chips } = buildFlowLayout(convertedQuestions, expanded);
+  set({ nodes, edges, chips });
+  get().applyFilter();
+},
+getFlowElements: () => { get().rebuildGraph(); set({ layoutVersion: get().layoutVersion + 1 }); }, // bump → re-focus
+toggleExpand: (id) => { set((s) => ({ expanded: { ...s.expanded, [id]: s.expanded[id] === false ? true : false } })); get().rebuildGraph(); },
+toggleFilter: (key) => { set((s) => ({ filter: s.filter.includes(key) ? s.filter.filter((k) => k !== key) : [...s.filter, key] })); get().applyFilter(); },
+    clearFilter: () => { set({ filter: [] }); get().applyFilter(); },
+    applyFilter: () => set((s) => {
+      const sel = s.filter; const active = sel.length > 0;
+      const on = (n: any) => { const k = n.data?.filterKey; return k ? sel.includes(k) : true; };
+      const nodes = s.nodes.map((n) => ({ ...n, style: { ...n.style, opacity: !active || on(n) ? 1 : 0.12, transition: "opacity .2s" } }));
+      const op: Record<string, number> = Object.fromEntries(nodes.map((n) => [n.id, n.style!.opacity as number]));
+      const edges = s.edges.map((e) => ({ ...e, style: { ...e.style, opacity: !active ? 1 : Math.min(op[e.source] ?? 1, op[e.target] ?? 1) } }));
+      return { nodes, edges };
+    }),
   }))
 );
