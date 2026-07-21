@@ -1,44 +1,8 @@
-import React from "react";
-import { ConvertedQuestion, ConvertedOption } from "../../types/logic";
+import { ConvertedQuestion } from "../../types/logic";
+import { OptionsBlock } from "./OptionsBlock";
 
-interface Props { questions: ConvertedQuestion[]; }
-
-function OptionRow({ opt, hideLogic }: { opt: ConvertedOption; hideLogic?: boolean }) {
-  const rule = hideLogic ? null : (opt.showLogic?.text || opt.terminateLogic?.text || null);
-  return (
-    <li className="flex items-start gap-2 py-1 text-sm">
-      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5 mt-0.5">{opt.id}</span>
-      <span className="text-slate-800 flex-1">{opt.text}</span>
-      {rule && <span className="ml-auto shrink-0 max-w-[45%] text-[10px] text-amber-800 bg-amber-100 rounded px-1.5 py-0.5">{rule}</span>}
-    </li>
-  );
-}
-
-function OptionsBlock({ options }: { options: ConvertedOption[] }) {
-  if (options.length === 0) return null;
-  const keyOf = (o?: ConvertedOption) => (o ? o.showLogic?.text || o.terminateLogic?.text || null : null);
-
-  return (
-    <ul className="divide-y divide-slate-100">
-      {options.map((o, i) => {
-        const k = keyOf(o);
-        const prevSame = i > 0 && keyOf(options[i - 1]) === k;
-        const nextSame = i < options.length - 1 && keyOf(options[i + 1]) === k;
-        const inGroup = !!k && (prevSame || nextSame);   // shared by a neighbor → it's a group
-        const groupStart = inGroup && !prevSame;          // first row of the run
-        return (
-          <React.Fragment key={o.id}>
-            {groupStart && (
-              <li className="pt-2 pb-1">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded">{k}</span>
-              </li>
-            )}
-            <OptionRow opt={o} hideLogic={inGroup} />
-          </React.Fragment>
-        );
-      })}
-    </ul>
-  );
+interface Props {
+  questions: ConvertedQuestion[];
 }
 
 export default function ConvertedQuestionsView({ questions }: Props) {
@@ -53,13 +17,14 @@ export default function ConvertedQuestionsView({ questions }: Props) {
   return (
     <div className="p-3 bg-slate-100 min-h-full">
       <div className="w-full space-y-2">
-        <h2 className="mb-3 text-slate-800 text-xl font-bold">
-          Survey Questions — Converted View
-        </h2>
+        <h2 className="mb-3 text-slate-800 text-xl font-bold">Survey Questions — Converted View</h2>
         {questions.map((q) => {
           if (q.type === "Structural Marker") {
             return (
-              <div key={q.id} className="text-[11px] font-bold uppercase tracking-wide text-slate-500 border-b border-slate-300 pt-3 pb-1">
+              <div
+                key={q.id}
+                className="text-[11px] font-bold uppercase tracking-wide text-slate-500 border-b border-slate-300 pt-3 pb-1"
+              >
                 {q.name}
               </div>
             );
@@ -70,8 +35,8 @@ export default function ConvertedQuestionsView({ questions }: Props) {
             <div
               key={q.id}
               className={`bg-white rounded-xl border border-slate-200 shadow-sm p-4 border-l-4 ${
-              q.isGrid ? "border-l-sky-500" : hasTerm ? "border-l-red-500" : "border-l-purple-500"
-            }`}
+                q.isGrid ? "border-l-sky-500" : hasTerm ? "border-l-red-500" : "border-l-purple-500"
+              }`}
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-1">
@@ -98,10 +63,10 @@ export default function ConvertedQuestionsView({ questions }: Props) {
                 </div>
               )}
 
-              {/* Options stub-list */}
-              {q.options.length > 0 && (
-                <OptionsBlock options={q.options} />
-              )}
+              {/* Options */}
+              {q.options.length > 0 && <OptionsBlock options={q.options} />}
+
+              {/* Grid columns */}
               {q.isGrid && q.columns && q.columns.length > 0 && (
                 <div className="mb-2">
                   <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-sky-100 text-sky-800 px-2 py-0.5 rounded mb-1">
