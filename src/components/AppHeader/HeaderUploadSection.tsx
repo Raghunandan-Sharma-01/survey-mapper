@@ -15,7 +15,7 @@ interface HeaderUploadSectionProps {
 }
 
 const FILE_ACCEPT_TYPES =
-  ".json,.docx,application/json,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 /**
  * Renders the file upload input and error message

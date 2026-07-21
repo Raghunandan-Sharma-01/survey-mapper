@@ -10,6 +10,7 @@ import {
   stripInstructionsFromQuestionText,
   stripInstructionsFromQuestionOptions,
   removeBlankAndDuplicateOptions,
+  mergeInsertVariants,
 } from "./textCleaning/questionCleaner";
 import { getInstructionsToStrip } from "./textCleaning/instructionStripper";
 
@@ -20,7 +21,8 @@ import { getInstructionsToStrip } from "./textCleaning/instructionStripper";
 export function cleanAndMergeQuestions(
   rawQuestions: ConvertedQuestion[],
 ): ConvertedQuestion[] {
-  const mergedQuestions = mergeDuplicateQuestions(rawQuestions);
+  let mergedQuestions = mergeDuplicateQuestions(rawQuestions);
+  mergedQuestions = mergeInsertVariants(mergedQuestions);
   const instructionsToStrip = getInstructionsToStrip();
 
   for (const q of mergedQuestions) {

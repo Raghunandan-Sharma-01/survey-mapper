@@ -3,11 +3,9 @@
  */
 
 import { isDocxFile } from "./fileTypeDetector";
-import { readJsonFile, ParsedJsonResult } from "./jsonFileReader";
 import { convertDocxToQuestions } from "../docConverter";
 
 export interface UploadHandlerCallbacks {
-  onJsonParsed: (result: ParsedJsonResult) => void;
   onDocxConverted: (questions: any[]) => void;
   onError: (message: string) => void;
   onLoadingChange: (isLoading: boolean) => void;
@@ -27,7 +25,9 @@ export async function handleFileUpload(
     if (isDocxFile(file)) {
       await handleDocxFileUpload(file, callbacks);
     } else {
-      handleJsonFileUpload(file, callbacks);
+      callbacks.onError(
+        "Unsupported file type. Please upload a .docx file.",
+      );
     }
   } catch (err) {
     const errorMessage =
@@ -37,20 +37,6 @@ export async function handleFileUpload(
   } finally {
     callbacks.onLoadingChange(false);
   }
-}
-
-/**
- * Processes JSON file upload
- */
-function handleJsonFileUpload(
-  file: File,
-  callbacks: UploadHandlerCallbacks,
-): void {
-  readJsonFile(
-    file,
-    (result) => callbacks.onJsonParsed(result),
-    (error) => callbacks.onError(error),
-  );
 }
 
 /**

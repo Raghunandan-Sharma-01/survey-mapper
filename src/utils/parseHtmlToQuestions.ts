@@ -34,6 +34,14 @@ export function parseHtmlToQuestions(html: string): ConvertedQuestion[] {
     
     // 2. IMPORTANT: Ignore the Table of Contents! (TOC items have href links to anchors)
     const isTOC = el.querySelector("a[href^='#']");
+    if (
+      (tagName === "p" || tagName.match(/^h[1-6]$/)) &&
+      !isTOC &&
+      /^(qc\s*flags|appendix\b|logic\s*rule\s*descriptions)\b/i.test(text)
+    ) {
+      if (currentQuestion) { questions.push(currentQuestion); currentQuestion = null; }
+      break;
+    }
 
     if ((tagName === "p" || tagName.match(/^h[1-6]$/)) && isStructuralMarker && !isTOC) {
       // Push any open table question first
@@ -78,40 +86,46 @@ export function parseHtmlToQuestions(html: string): ConvertedQuestion[] {
   return questions;
 }
 
-/**
- * Processes table element containing questions and options
- */
+// Collects [Name]/Show/Terminate <p> paragraphs from a question's wrapper cell
+// (a <td>/<th> that itself contains a nested <table>).
+function collectWrapperLogicParagraphs(el: Element): Element[] {
+  const paras: Element[] = [];
+  for (const cell of Array.from(el.querySelectorAll("td, th"))) {
+    if (!cell.querySelector("table")) continue; // only wrapper cells carry logic
+    for (const child of Array.from(cell.children)) {
+      if (child.tagName.toLowerCase() === "p") paras.push(child);
+    }
+  }
+  return paras;
+}
+
 function processTableElement(
   el: Element,
   questions: ConvertedQuestion[],
   currentQuestion: ConvertedQuestion | null,
   state: ParsingState,
 ): ConvertedQuestion | null {
-  const rows = Array.from(el.querySelectorAll("tr"));
+  // 1. Harvest [Name]/Show/Terminate paragraphs into parsing state.
+  for (const p of collectWrapperLogicParagraphs(el)) processParagraphElement(p, state);
+
+  // 2. FIX: only iterate LEAF rows (no nested table) so we never re-read the
+  //    whole question box as one blob row (that caused duplicates + pollution).
+  const rows = Array.from(el.querySelectorAll("tr")).filter((tr) => !tr.querySelector("table"));
   const cells2D = rows.map((row) =>
-    Array.from(row.querySelectorAll("td, th")).map(
-      (c) => c.textContent?.trim() || "",
-    ),
+    Array.from(row.querySelectorAll("td, th")).map((c) => c.textContent?.trim() || ""),
   );
 
   for (let r = 0; r < cells2D.length; r++) {
     const row = cells2D[r];
     if (row.every((c) => c === "")) continue;
-
     const idIndex = detectQuestionIdIndex(row);
-
     if (idIndex !== -1) {
-      if (currentQuestion) {
-        questions.push(currentQuestion);
-      }
+      if (currentQuestion) questions.push(currentQuestion);
       currentQuestion = createNewQuestion(row, idIndex, state);
-      state.pendingName = "";
-      state.pendingShow = "";
-      state.pendingTerminate = "";
+      state.pendingName = ""; state.pendingShow = ""; state.pendingTerminate = "";
     } else if (currentQuestion) {
       processOptionRow(row, currentQuestion);
     }
   }
-
   return currentQuestion;
 }

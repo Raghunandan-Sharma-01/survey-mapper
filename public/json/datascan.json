@@ -1,0 +1,65 @@
+{
+  "id": "datascan",
+  "title": "Data Scan",
+  "heading": "Data Scan Rules",
+  "description": "Select a category below to view its specific data scan checks.",
+  "categories": [
+    {
+      "subId": "ds-global",
+      "title": "Global Variable Checks",
+      "items": [
+        "Contains all expected categories.",
+        "If ask all has base of total n.",
+        "If filtered (question or iterations) has filtered/reduced base.",
+        "All categories within a variable have data or an expected zero."
+      ]
+    },
+    {
+      "subId": "ds-comp",
+      "title": "COMP, Terminations & Sampling",
+      "items": [
+        "<strong>COMP:</strong> Sense check of statuses based on project expectations.",
+        "<strong>COMP:</strong> Should not have Script Errors or other unusual statuses.",
+        "<strong>COMP:</strong> Should not have unexpected OQs.",
+        "<strong>COMP:</strong> Should not have a majority of drop-offs/breakoffs.",
+        "<strong>DataCollection.EndQuestion:</strong> Should primarily be early questions/intro or the final question.",
+        "Verify functionality of all terms check logically if possible, especially for untriggered terms.",
+        "<strong>Link Type:</strong> Verify functionality of Link Type logic for special links and augments."
+      ]
+    },
+    {
+      "subId": "ds-quota",
+      "title": "Quota Tables",
+      "items": [
+        "Quota tables do not contain any -1 or 0-normal target values.",
+        "Quota tables for assigners contain appropriate targets based on random/most need methodology.",
+        "Quota tables for most needed assigners are not set to counter.",
+        "Quotas that are filtered to only a subset of respondents are filtering correctly.",
+        "For international/market-based studies, quota tables are split by market and/or link type."
+      ]
+    },
+    {
+      "subId": "ds-assigners",
+      "title": "Assigners",
+      "items": [
+        "Eligibility variables fully populated for eligible respondents.",
+        "Most Need assignment: Items should be assigned relatively evenly based on targets.",
+        "Random assignment: Items should be assigned proportional to eligibility.",
+        "Priority Assignments: Priority items should be assigned whenever eligible.",
+        "Respondents not eligible for an assigner: handled as directed (term, skipping, etc.)."
+      ]
+    },
+    {
+      "subId": "ds-special",
+      "title": "Specialized Question Checks",
+      "items": [
+        "<strong>QC Flags:</strong> Confirm logic and no unusual incidence.",
+        "<strong>Segmentation algorithms:</strong> Classifying all applicable respondents.",
+        "<strong>DCM/MaxDiff:</strong> Version Assignment handled via mostneed assigner.",
+        "<strong>PBS exercises:</strong> data flowing correctly for appropriate filtered or assigned brands.",
+        "<strong>Open-Ends:</strong> any obvious response quality issues?",
+        "<strong>Property-based filtering:</strong> ensuring correct application."
+      ]
+    }
+  ]
+}

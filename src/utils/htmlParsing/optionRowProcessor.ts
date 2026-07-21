@@ -7,8 +7,8 @@ import { ConvertedQuestion } from "../../types/logic";
 import {
   isMetadataRow,
   isOptionMarker,
-  looksLikeQuestionText,
   determineQuestionTypeFromText,
+  isGridInstruction,
 } from "./htmlElementProcessor";
 
 /**
@@ -24,14 +24,31 @@ export function processOptionRow(
   // --- THE LOOKBACK CATCH ---
   // If this row is JUST an exclusive/anchor modifier, apply it to the previous option
   const upperRowText = rowText.toUpperCase();
-  if (/^(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?$/.test(upperRowText)) {
+  if (/^((?:EXCLUSIVE|ANCHOR|ALWAYS SHOWN)[.\s]*)+$/.test(upperRowText)) {
     const lastOption = currentQuestion.options[currentQuestion.options.length - 1];
     if (lastOption) {
       if (upperRowText.includes("EXCLUSIVE")) lastOption.isExclusive = true;
       if (upperRowText.includes("ANCHOR")) lastOption.isAnchor = true;
       if (upperRowText.includes("ALWAYS SHOWN")) lastOption.isAlwaysShown = true;
     }
-    return; // Exit early, we handled it!
+    return;
+  }
+// Grid column-header row: a "COLS:"/"ROWS:" metadata cell followed by the
+  // column labels. Column ids align to the per-column codes in the data rows (1..n).
+  if (/^(COLS:|ROWS:)/i.test(row[0]?.trim() || "")) {
+    const headers = row.slice(1).map((c) => c.trim()).filter((c) => c !== "");
+    if (headers.length > 0) {
+      currentQuestion.isGrid = true;
+      currentQuestion.columns = headers.map((t, i) => ({ id: String(i + 1), text: t }));
+    }
+    return;
+  }
+// A stub-group line has no option marker but carries "Show if ... [XX] at QID".
+  // Capture it and apply to the stubs that follow (until the next group line / question).
+  const hasMarker = row.some((c) => isOptionMarker(c));
+  if (!hasMarker && /show if|only show|autocode/i.test(rowText)) {
+    (currentQuestion as any)._grp = rowText.replace(/^(default order|randomize list)\.?\s*/i, "").trim();
+    return;
   }
 
   // Ignore metadata rows
@@ -39,17 +56,15 @@ export function processOptionRow(
 
   // Determine question type from row and update current question
   const questionType = determineQuestionTypeFromText(rowText);
-  if (questionType !== "Multiple Choice") {
-    currentQuestion.type = questionType;
-  }
+  if (questionType !== "Multiple Choice") currentQuestion.type = questionType;
+  // Grid-ness is orthogonal to response type (single / multi / numeric grid).
+  if (isGridInstruction(rowText)) currentQuestion.isGrid = true;
 
-  // Check for multi-column option format
+  // Check for multi-column option format. A leading option marker ("1.", "a.")
+  // is proof this is a stub, so we do NOT defer to looksLikeQuestionText here —
+  // that wrongly sent long stubs (with parenthetical examples) into the question text.
   const codeIndex = row.findIndex((c) => isOptionMarker(c));
-  if (
-    codeIndex !== -1 &&
-    row[codeIndex + 1] &&
-    !looksLikeQuestionText(row[codeIndex + 1])
-  ) {
+  if (codeIndex !== -1 && row[codeIndex + 1]) {
     parseOptionMultiColumn(row, codeIndex, currentQuestion);
     return;
   }
@@ -84,10 +99,10 @@ function parseOptionMultiColumn(
     .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
     .trim();
 
-  if (looksLikeQuestionText(cleanOptText)) {
-    currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
-    return;
-  }
+  // if (looksLikeQuestionText(cleanOptText)) {
+  //   currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
+  //   return;
+  // }
 
   currentQuestion.options.push({
     id: row[codeIndex].replace(/[.:]$/, ""),
@@ -95,7 +110,7 @@ function parseOptionMultiColumn(
     isExclusive,
     isAnchor,
     isAlwaysShown,
-    showLogic: { text: optShow, condition: null },
+    showLogic: { text: optShow ?? (currentQuestion as any)._grp ?? null, condition: null },
     terminateLogic: { text: optTerm, condition: null },
   });
 }
@@ -124,10 +139,10 @@ function parseOptionCombined(
       .replace(/(EXCLUSIVE|ANCHOR|ALWAYS SHOWN)\.?/gi, "")
       .trim();
 
-    if (looksLikeQuestionText(cleanOptText)) {
-      currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
-      return;
-    }
+    // if (looksLikeQuestionText(cleanOptText)) {
+    //   currentQuestion.text += "\n" + row.filter((c) => c !== "").join(" ");
+    //   return;
+    // }
 
     // 3. Push the new object
     currentQuestion.options.push({
@@ -136,7 +151,7 @@ function parseOptionCombined(
       isExclusive,
       isAnchor,
       isAlwaysShown,
-      showLogic: { text: null, condition: null },
+      showLogic: { text: (currentQuestion as any)._grp ?? null, condition: null },
       terminateLogic: { text: null, condition: null },
     });
   } else {

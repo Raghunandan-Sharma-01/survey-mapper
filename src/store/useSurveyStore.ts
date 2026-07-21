@@ -8,18 +8,13 @@ import {
   SurveyBlock,
   ConvertedQuestion,
 } from "../types/logic";
-import {
-  buildGraphLevelLayout,
-  calculateAllPaths,
-} from "../engine/graphBuilder";
-import _ from "lodash";
-import {
-  readableCondition,
-  resolveEffectiveLogic,
-} from "../utils/logicHelpers";
-import { parseSurveyData } from "../engine/surveyParser";
-import { parseTextToLogicNode } from "../utils/htmlParsing/logicParser";
+import { buildFlowLayout, FilterChip } from "../engine/flow/buildFlowLayout";
 
+/**
+ * A question from either source: parsed survey JSON (Question) or a converted
+ * document (ConvertedQuestion). Only ConvertedQuestion carries showLogic /
+ * terminateLogic, so access is narrowed through the helpers below.
+ */
 interface SurveyStore {
   data: any[];
   refinedQuestions: Question[];
@@ -29,11 +24,9 @@ interface SurveyStore {
   nodes: Node[];
   edges: Edge[];
 
-  // 1. ADD THESE BACK TO THE INTERFACE
   currentView: "editor" | "map";
   setView: (view: "editor" | "map") => void;
 
-  setSurveyData: (data: any[]) => void;
   setConvertedQuestions: (questions: ConvertedQuestion[]) => void; // For document uploads
   updateLogic: (id: string, logic: Partial<QuestionLogic>) => void;
   getFlowElements: () => void;
@@ -43,6 +36,17 @@ interface SurveyStore {
   setActivePath: (index: number | null) => void;
 
   blocks: Record<string, SurveyBlock>;
+  direction: "vertical" | "horizontal";
+  chips: FilterChip[];
+  filter: string[];
+  toggleFilter: (key: string) => void;
+  clearFilter: () => void;
+  applyFilter: () => void;
+  layoutVersion: number; 
+
+  expanded: Record<string, boolean>;
+  rebuildGraph: () => void;
+  toggleExpand: (id: string) => void;
 }
 
 export const useSurveyStore = create<SurveyStore>()(
@@ -54,8 +58,12 @@ export const useSurveyStore = create<SurveyStore>()(
     loopBlocks: [],
     nodes: [],
     edges: [],
+    chips: [],
+    filter: {},
     paths: [],
     activePathIndex: null,
+    layoutVersion: 0,
+    expanded: {},
 
     // 2. ADD THE INITIAL STATE
     currentView: "editor",
@@ -69,30 +77,10 @@ export const useSurveyStore = create<SurveyStore>()(
       }
     },
 
-    setSurveyData: (rawData) => {
-      // Use the new parser!
-      const { refinedQuestions, blocks } = parseSurveyData(rawData);
-
-      const initialLogicMap: Record<string, QuestionLogic> = {};
-
-      set({
-        data: rawData,
-        refinedQuestions,
-        blocks, // Save the structural blocks to the store!
-        logicMap: initialLogicMap,
-      });
-
-      get().getFlowElements();
-    },
-
     setConvertedQuestions: (questions) => {
-      set({
-        convertedQuestions: questions,
-        currentView: "editor", // Switch to editor view when converted data is loaded
-      });
-      // FIX: Calculate the initial graph elements in the background
-      get().getFlowElements(); 
-    },
+  set({ convertedQuestions: questions, currentView: "editor", expanded: {}, filter: [] });
+  get().getFlowElements();
+},
 
     updateLogic: (id, logic) => {
       set((state) => ({
@@ -104,20 +92,19 @@ export const useSurveyStore = create<SurveyStore>()(
           },
         },
       }));
-
       get().getFlowElements();
     },
+
     setActivePath: (index) => {
       set((state) => {
         const activePath = index !== null ? state.paths[index] : null;
-
         const updatedNodes = state.nodes.map((node) => ({
           ...node,
           style: {
             ...node.style,
             opacity:
               activePath === null || activePath.includes(node.id) ? 1 : 0.2,
-            transition: "opacity 0.3s ease", // Smooth fade effect
+            transition: "opacity 0.3s ease",
           },
         }));
 
@@ -144,168 +131,25 @@ export const useSurveyStore = create<SurveyStore>()(
         };
       });
     },
-    getFlowElements: () => {
-      const { refinedQuestions, convertedQuestions, logicMap, blocks } = get();
-      
-      const sourceQuestions = refinedQuestions.length > 0 ? refinedQuestions : convertedQuestions;
-      
-      if (sourceQuestions.length === 0) {
-        console.warn("Graph generation aborted: No questions available.");
-        return;
-      }
 
-      // --- 1. DYNAMIC BLOCK REBUILDER (No Hardcoding!) ---
-      const dynamicBlocks: Record<string, any> = { ...blocks };
-      const activeBlocks: any[] = []; // Tracks open blocks like a stack
-      let blockCounter = 1;
-
-      const processedQuestions: any[] = [];
-
-      for (const q of sourceQuestions) {
-        const name = (q.name || "").trim();
-        const text = (q.text || "").trim();
-        const isMarker = q.type === "Structural Marker";
-
-        if (isMarker) {
-          const lowerText = text.toLowerCase();
-          
-          let type = "Section";
-          if (lowerText.includes("loop")) type = "Loop";
-          else if (lowerText.includes("subsection")) type = "Subsection";
-          else if (lowerText.includes("page")) type = "Page";
-
-          if (lowerText.includes("start")) {
-            const cleanName = text.replace(/^(loop|subsection|section|page)\s*start\s*-?\s*/i, "").trim() || type;
-            const blockId = `block_${type.toLowerCase()}_${blockCounter++}`;
-            
-            dynamicBlocks[blockId] = {
-              id: blockId,
-              type: type as any, // Cast to BlockType if needed
-              name: cleanName,
-              // FIX: Assert as ConvertedQuestion to safely access showLogic
-              logicText: (q as ConvertedQuestion).showLogic?.text || "", 
-              firstQuestionId: null,
-              lastQuestionId: null
-            };
-            activeBlocks.push(dynamicBlocks[blockId]);
-            
-          } 
-          else if (lowerText.includes("end")) {
-            for (let i = activeBlocks.length - 1; i >= 0; i--) {
-              if (activeBlocks[i].type === type) {
-                activeBlocks.splice(i, 1);
-                break;
-              }
-            }
-          }
-          continue; 
-        }
-
-        // --- MERGE CONTROLLER QUESTIONS ---
-        const currentLoop = activeBlocks.find(b => b.type === "Loop");
-        if (currentLoop && name === currentLoop.name) {
-          // FIX: Assert as ConvertedQuestion here too
-          const qAsConverted = q as ConvertedQuestion;
-          if (qAsConverted.showLogic?.text) {
-            const existingLogic = dynamicBlocks[currentLoop.id].logicText;
-            dynamicBlocks[currentLoop.id].logicText = existingLogic 
-              ? `${existingLogic}\n${qAsConverted.showLogic.text}` 
-              : qAsConverted.showLogic.text;
-          }
-          continue; 
-        }
-        // Tag standard questions with ALL active nested blocks
-        processedQuestions.push({
-          ...q,
-          parentBlocks: activeBlocks.map(b => b.id),
-        });
-      }
-
-      // --- 2. ADAPT QUESTIONS ---
-      const mappedQuestions = processedQuestions.map((q: any) => ({
-        id: q.id as unknown as number, 
-        uniqueKey: q.id.toString(),
-        name: q.name || q.id,
-        fullName: q.name || q.id, 
-        text: q.text || null, 
-        type: q.type,
-        parentBlocks: q.parentBlocks, 
-        sectionName: q.parentBlocks?.[0] || "", 
-        rows: [],
-        columns: [],
-        listOrder: 0
-      })) as unknown as Question[];
-
-      // --- 3. RESOLVE LOGIC MAP ---
-      const resolvedLogicMap: Record<string, any> = {};
-      mappedQuestions.forEach((question) => {
-        const convertedQ = processedQuestions.find(c => c.id.toString() === question.id.toString());
-        
-        if (convertedQ && (convertedQ.showLogic?.text || convertedQ.terminateLogic?.text)) {
-           resolvedLogicMap[question.id.toString()] = {
-              show: parseTextToLogicNode(convertedQ.showLogic.text), 
-              terminate: parseTextToLogicNode(convertedQ.terminateLogic.text),
-              rawShowText: convertedQ.showLogic.text, 
-              rawTerminateText: convertedQ.terminateLogic.text
-           };
-        } else {
-           resolvedLogicMap[question.id.toString()] = resolveEffectiveLogic(
-             question.id.toString(),
-             mappedQuestions,
-             dynamicBlocks,
-             logicMap
-           );
-        }
-      });
-
-      // --- 4. GENERATE GRAPH ---
-      // (Using your perfected layoutCalculator code!)
-      const { nodes, edges } = buildGraphLevelLayout(
-        mappedQuestions,
-        resolvedLogicMap,
-        dynamicBlocks, 
-        readableCondition
-      );
-
-      // --- 5. THE ULTIMATE PATH SANITIZER ---
-      // 1. Hide the background boxes so they don't count as isolated nodes
-      const pathableNodes = nodes.filter(n => !n.id.startsWith("box-"));
-      
-      // 2. Hide backwards loop edges! If DFS walks backwards, it doubles the paths!
-      const pathableEdges = edges.filter(e => !e.id.startsWith("loop-edge-"));
-      
-      // Calculate paths using the sanitized arrays
-      const rawPaths = calculateAllPaths(pathableNodes, pathableEdges);
-      const uniquePathsMap = new Map<string, string[]>();
-      
-      // 3. Deduplicate exact matches (ignoring Terminate nodes)
-      rawPaths.forEach(path => {
-        const signature = path.filter(p => !p.startsWith("TERM-")).join("->");
-        if (!uniquePathsMap.has(signature)) {
-          uniquePathsMap.set(signature, path);
-        }
-      });
-      
-      let deduplicatedPaths = Array.from(uniquePathsMap.values());
-
-      // 4. Strip out "Partial Walks" (Subsets)
-      // If Path A is "S1->S2" and Path B is "S1->S2->S3", Path A is a fake partial path. Delete it!
-      deduplicatedPaths = deduplicatedPaths.filter((currentPath, index, array) => {
-         const currentStr = currentPath.join("->");
-         
-         const isSubset = array.some((otherPath, otherIndex) => {
-            if (index === otherIndex) return false;
-            const otherStr = otherPath.join("->");
-            return otherStr.includes(currentStr) && otherStr.length > currentStr.length;
-         });
-         
-         // If a path ends in a Terminate node, it's a valid unique route! Protect it from deletion.
-         const isTerminate = currentPath[currentPath.length - 1].startsWith("TERM-");
-         
-         return !isSubset || isTerminate;
-      });
-
-      set({ nodes, edges, paths: deduplicatedPaths });
-    },
+    rebuildGraph: () => {
+  const { convertedQuestions, expanded } = get();
+  if (!convertedQuestions.length) return;
+  const { nodes, edges, chips } = buildFlowLayout(convertedQuestions, expanded);
+  set({ nodes, edges, chips });
+  get().applyFilter();
+},
+getFlowElements: () => { get().rebuildGraph(); set({ layoutVersion: get().layoutVersion + 1 }); }, // bump → re-focus
+toggleExpand: (id) => { set((s) => ({ expanded: { ...s.expanded, [id]: s.expanded[id] === false ? true : false } })); get().rebuildGraph(); },
+toggleFilter: (key) => { set((s) => ({ filter: s.filter.includes(key) ? s.filter.filter((k) => k !== key) : [...s.filter, key] })); get().applyFilter(); },
+    clearFilter: () => { set({ filter: [] }); get().applyFilter(); },
+    applyFilter: () => set((s) => {
+      const sel = s.filter; const active = sel.length > 0;
+      const on = (n: any) => { const k = n.data?.filterKey; return k ? sel.includes(k) : true; };
+      const nodes = s.nodes.map((n) => ({ ...n, style: { ...n.style, opacity: !active || on(n) ? 1 : 0.12, transition: "opacity .2s" } }));
+      const op: Record<string, number> = Object.fromEntries(nodes.map((n) => [n.id, n.style!.opacity as number]));
+      const edges = s.edges.map((e) => ({ ...e, style: { ...e.style, opacity: !active ? 1 : Math.min(op[e.source] ?? 1, op[e.target] ?? 1) } }));
+      return { nodes, edges };
+    }),
   }))
 );

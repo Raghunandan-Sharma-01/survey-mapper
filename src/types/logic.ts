@@ -31,7 +31,7 @@ export interface SurveyBlock {
 }
 
 export interface Question {
-  id: number;
+  id: string;
   uniqueKey: string;
   name: string;
   fullName: string;
@@ -84,6 +84,9 @@ export interface TerminationRule {
 export interface QuestionLogic {
   show?: LogicNode | null;
   terminate?: LogicNode | null;
+  /** Original human-readable logic text, preserved from document conversion. */
+  rawShowText?: string | null;
+  rawTerminateText?: string | null;
 }
 
 /**
@@ -145,5 +148,7 @@ export interface ConvertedQuestion {
   parentBlocks: string[]; // e.g., ["subsection_follow_up"]
   showLogic: LogicTextRepresentation;
   terminateLogic: LogicTextRepresentation;
-  options: ConvertedOption[];
+  options: ConvertedOption[]; // for grids, these are the ROW stubs
+  isGrid?: boolean;
+  columns?: { id: string; text: string }[];  
 }

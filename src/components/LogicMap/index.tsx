@@ -1,23 +1,30 @@
-import React, { useMemo } from "react";
-import ReactFlow, {
-  Background,
-  Controls,
-  BackgroundVariant,
-  MiniMap,
-  Panel,
-} from "reactflow";
+import { useRef, useEffect, useCallback } from "react";
+import ReactFlow, { Background, Controls, BackgroundVariant, MiniMap, ReactFlowInstance } from "reactflow";
 import "reactflow/dist/style.css";
-
 import { useSurveyStore } from "../../store/useSurveyStore";
-import QuestionNode from "./QuestionNode";
-import PathSelector from "./PathSelector";
+import { nodeTypes } from "./nodes";
+import FilterBar from "./FilterBar";
 
 const LogicMap = () => {
-  const { nodes, edges } = useSurveyStore();
+  const { nodes, edges, layoutVersion, toggleExpand } = useSurveyStore();
+  const rf = useRef<ReactFlowInstance | null>(null);
 
-  // 1. THE FIX: Memoize nodeTypes and edgeOptions
-  const nodeTypes = useMemo(() => ({ questionNode: QuestionNode }), []);
-  const defaultEdgeOptions = useMemo(() => ({ type: "smoothstep" }), []);
+  const focusFirst = useCallback((inst: ReactFlowInstance) => {
+    const first = inst.getNodes().find((n) => n.type === "spineNode");
+    if (!first) {
+      inst.fitView({ padding: 0.2 });
+      return;
+    }
+    inst.setCenter(first.position.x + 100, first.position.y + 30, { zoom: 0.9, duration: 300 });
+  }, []);
+
+  // Re-focus only on real layout rebuilds (initial load, structural changes).
+  useEffect(() => {
+    const inst = rf.current;
+    if (!inst) return;
+    const t = setTimeout(() => focusFirst(inst), 60);
+    return () => clearTimeout(t);
+  }, [layoutVersion, focusFirst]);
 
   return (
     <div className="grow h-full bg-gray-50">
@@ -25,16 +32,22 @@ const LogicMap = () => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        fitView
-        minZoom={0.2}
+        onInit={(inst) => {
+          rf.current = inst;
+          focusFirst(inst);
+        }}
+        minZoom={0.15}
         maxZoom={1.5}
-        defaultEdgeOptions={defaultEdgeOptions}
+        defaultEdgeOptions={{ type: "straight" }}
+        onNodeClick={(_, node) => {
+          if (node.type === "branchNode" || node.type === "loopNode") toggleExpand(node.id);
+        }}
         proOptions={{ hideAttribution: true }}
       >
-        <Panel position="top-left" className="m-4">
-          <PathSelector />
-        </Panel>
-
+        <FilterBar
+          onFocus={() => rf.current && focusFirst(rf.current)}
+          onFit={() => rf.current?.fitView({ padding: 0.2, duration: 300 })}
+        />
         <MiniMap nodeStrokeWidth={3} zoomable pannable className="bg-white" />
         <Controls />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />

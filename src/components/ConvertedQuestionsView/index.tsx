@@ -1,13 +1,11 @@
-import React from "react";
 import { ConvertedQuestion } from "../../types/logic";
+import { OptionsBlock } from "./OptionsBlock";
 
-interface ConvertedQuestionsViewProps {
+interface Props {
   questions: ConvertedQuestion[];
 }
 
-export default function ConvertedQuestionsView({
-  questions,
-}: ConvertedQuestionsViewProps) {
+export default function ConvertedQuestionsView({ questions }: Props) {
   if (questions.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
@@ -15,93 +13,77 @@ export default function ConvertedQuestionsView({
       </div>
     );
   }
-  
 
   return (
-    <div className="flex-1 overflow-y-auto p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h2 className="mb-5 text-gray-800 text-2xl font-bold">
-          Survey Questions - Converted View
-        </h2>
-
-        {questions.map((q) => (
-          <div
-            key={q.id}
-            className="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-blue-500"
-          >
-            {/* Question Header */}
-            <div className="mb-4">
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded">
-                  {q.id}
-                </span>
-                <span className="text-xs text-gray-500">{q.type}</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+    <div className="p-3 bg-slate-100 min-h-full">
+      <div className="w-full space-y-2">
+        <h2 className="mb-3 text-slate-800 text-xl font-bold">Survey Questions — Converted View</h2>
+        {questions.map((q) => {
+          if (q.type === "Structural Marker") {
+            return (
+              <div
+                key={q.id}
+                className="text-[11px] font-bold uppercase tracking-wide text-slate-500 border-b border-slate-300 pt-3 pb-1"
+              >
                 {q.name}
-              </h3>
-              <p className="text-gray-700">{q.text}</p>
-            </div>
-
-            {/* Question-level Logic */}
-            <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded">
-              <div>
-                <label className="text-xs font-semibold text-gray-600 block mb-1">
-                  Show Logic
-                </label>
-                <p className="text-sm text-gray-700 italic">
-                  {q.showLogic.text || "—"}
-                </p>
               </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600 block mb-1">
-                  Terminate Logic
-                </label>
-                <p className="text-sm text-gray-700 italic">
-                  {q.terminateLogic.text || "—"}
-                </p>
-              </div>
-            </div>
+            );
+          }
 
-            {/* Options/Stubs */}
-            {q.options.length > 0 && (
-              <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-3">
-                  Options
-                </label>
-                <div className="space-y-2">
-                  {q.options.map((opt) => (
-                    <div
-                      key={opt.id}
-                      className="p-3 bg-gray-50 border border-gray-200 rounded"
-                    >
-                      <div className="flex items-start gap-3 mb-2">
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded min-w-fit">
-                          Code: {opt.id}
-                        </span>
-                        <span className="text-sm text-gray-800">{opt.text}</span>
-                      </div>
-                      {(opt.showLogic.text || opt.terminateLogic.text) && (
-                        <div className="ml-12 text-xs text-gray-600 space-y-1">
-                          {opt.showLogic.text && (
-                            <div>
-                              <span className="font-semibold">Show:</span> {opt.showLogic.text}
-                            </div>
-                          )}
-                          {opt.terminateLogic.text && (
-                            <div>
-                              <span className="font-semibold">Terminate:</span> {opt.terminateLogic.text}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+          const hasTerm = !!q.terminateLogic?.text;
+          return (
+            <div
+              key={q.id}
+              className={`bg-white rounded-xl border border-slate-200 shadow-sm p-4 border-l-4 ${
+                q.isGrid ? "border-l-sky-500" : hasTerm ? "border-l-red-500" : "border-l-purple-500"
+              }`}
+            >
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded">{q.id}</span>
+                <span className="text-[11px] text-slate-500 bg-slate-100 rounded-full px-2 py-0.5">
+                  {q.isGrid ? `Grid · ${q.type}` : q.type}
+                </span>
+                {hasTerm && (
+                  <span className="ml-auto text-[11px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-md">
+                    🛑 {q.terminateLogic.text}
+                  </span>
+                )}
+              </div>
+              {q.name && q.name !== q.id && <div className="text-xs text-slate-500 mb-1">{q.name}</div>}
+              <p className="text-slate-700 text-sm mb-2">{q.text}</p>
+
+              {/* Show-logic stub */}
+              {q.showLogic?.text && (
+                <div className="bg-purple-50 border border-dashed border-purple-400 rounded-lg px-2.5 py-1.5 text-purple-800 text-xs flex flex-wrap gap-1.5 items-center mb-2">
+                  <span className="bg-purple-200 text-purple-800 uppercase font-bold text-[10px] tracking-wide px-1.5 py-0.5 rounded">
+                    Show
+                  </span>
+                  {q.showLogic.text}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+
+              {/* Options */}
+              {q.options.length > 0 && <OptionsBlock options={q.options} />}
+
+              {/* Grid columns */}
+              {q.isGrid && q.columns && q.columns.length > 0 && (
+                <div className="mb-2">
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-sky-100 text-sky-800 px-2 py-0.5 rounded mb-1">
+                    Columns
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {q.columns.map((c) => (
+                      <span key={c.id} className="text-[11px] bg-sky-50 border border-sky-200 text-sky-800 rounded px-1.5 py-0.5">
+                        {c.id}. {c.text}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
