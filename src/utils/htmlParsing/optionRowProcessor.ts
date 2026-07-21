@@ -44,6 +44,13 @@ export function processOptionRow(
     }
     return;
   }
+// A stub-group line has no option marker but carries "Show if ... [XX] at QID".
+  // Capture it and apply to the stubs that follow (until the next group line / question).
+  const hasMarker = row.some((c) => isOptionMarker(c));
+  if (!hasMarker && /show if|only show|autocode/i.test(rowText)) {
+    (currentQuestion as any)._grp = rowText.replace(/^(default order|randomize list)\.?\s*/i, "").trim();
+    return;
+  }
 
   // Ignore metadata rows
   if (isMetadataRow(rowText)) return;
@@ -106,7 +113,7 @@ function parseOptionMultiColumn(
     isExclusive,
     isAnchor,
     isAlwaysShown,
-    showLogic: { text: optShow, condition: null },
+    showLogic: { text: optShow ?? (currentQuestion as any)._grp ?? null, condition: null },
     terminateLogic: { text: optTerm, condition: null },
   });
 }
@@ -147,7 +154,7 @@ function parseOptionCombined(
       isExclusive,
       isAnchor,
       isAlwaysShown,
-      showLogic: { text: null, condition: null },
+      showLogic: { text: (currentQuestion as any)._grp ?? null, condition: null },
       terminateLogic: { text: null, condition: null },
     });
   } else {

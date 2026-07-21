@@ -150,5 +150,5 @@ export interface ConvertedQuestion {
   terminateLogic: LogicTextRepresentation;
   options: ConvertedOption[]; // for grids, these are the ROW stubs
   isGrid?: boolean;
-  columns?: { id: string; text: string }[];
+  columns?: { id: string; text: string }[];  
 }

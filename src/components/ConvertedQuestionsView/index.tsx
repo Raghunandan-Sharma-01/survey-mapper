@@ -1,6 +1,45 @@
-import { ConvertedQuestion } from "../../types/logic";
+import React from "react";
+import { ConvertedQuestion, ConvertedOption } from "../../types/logic";
 
 interface Props { questions: ConvertedQuestion[]; }
+
+function OptionRow({ opt, hideLogic }: { opt: ConvertedOption; hideLogic?: boolean }) {
+  const rule = hideLogic ? null : (opt.showLogic?.text || opt.terminateLogic?.text || null);
+  return (
+    <li className="flex items-start gap-2 py-1 text-sm">
+      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5 mt-0.5">{opt.id}</span>
+      <span className="text-slate-800 flex-1">{opt.text}</span>
+      {rule && <span className="ml-auto shrink-0 max-w-[45%] text-[10px] text-amber-800 bg-amber-100 rounded px-1.5 py-0.5">{rule}</span>}
+    </li>
+  );
+}
+
+function OptionsBlock({ options }: { options: ConvertedOption[] }) {
+  if (options.length === 0) return null;
+  const keyOf = (o?: ConvertedOption) => (o ? o.showLogic?.text || o.terminateLogic?.text || null : null);
+
+  return (
+    <ul className="divide-y divide-slate-100">
+      {options.map((o, i) => {
+        const k = keyOf(o);
+        const prevSame = i > 0 && keyOf(options[i - 1]) === k;
+        const nextSame = i < options.length - 1 && keyOf(options[i + 1]) === k;
+        const inGroup = !!k && (prevSame || nextSame);   // shared by a neighbor → it's a group
+        const groupStart = inGroup && !prevSame;          // first row of the run
+        return (
+          <React.Fragment key={o.id}>
+            {groupStart && (
+              <li className="pt-2 pb-1">
+                <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded">{k}</span>
+              </li>
+            )}
+            <OptionRow opt={o} hideLogic={inGroup} />
+          </React.Fragment>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function ConvertedQuestionsView({ questions }: Props) {
   if (questions.length === 0) {
@@ -61,22 +100,7 @@ export default function ConvertedQuestionsView({ questions }: Props) {
 
               {/* Options stub-list */}
               {q.options.length > 0 && (
-                <ul className="mt-1 divide-y divide-slate-100">
-                  {q.options.map((opt) => {
-                    const rule = opt.showLogic?.text || opt.terminateLogic?.text;
-                    return (
-                      <li key={opt.id} className="flex items-center gap-2 py-1.5 text-sm">
-                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5">{opt.id}</span>
-                        <span className="text-slate-800">{opt.text}</span>
-                        {opt.isExclusive && <span className="text-[9px] uppercase font-bold text-amber-700 bg-amber-100 rounded px-1.5 py-0.5">Excl</span>}
-                        {opt.isAnchor && <span className="text-[9px] uppercase font-bold text-teal-700 bg-teal-100 rounded px-1.5 py-0.5">Anchor</span>}
-                        {rule && (
-                          <span className="ml-auto text-[11px] text-orange-800 bg-orange-100 rounded px-1.5 py-0.5">{rule}</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
+                <OptionsBlock options={q.options} />
               )}
               {q.isGrid && q.columns && q.columns.length > 0 && (
                 <div className="mb-2">

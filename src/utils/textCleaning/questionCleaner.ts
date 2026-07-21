@@ -3,7 +3,7 @@
  * Handles merging duplicates, cleaning squashed logic, and removing metadata
  */
 
-import { ConvertedQuestion } from "../../types/logic";
+import { ConvertedOption, ConvertedQuestion } from "../../types/logic";
 import { stripInstructionsFromText } from "./instructionStripper";
 import { cleanSquashedLogicText, extractMissingOptionsFromSquashedLogic } from "../htmlParsing/logicExtractor";
 import { looksLikeQuestionText } from "../htmlParsing/htmlElementProcessor";
@@ -115,4 +115,25 @@ export function removeBlankAndDuplicateOptions(q: ConvertedQuestion): void {
     (opt, index, self) =>
       opt.text !== "" && index === self.findIndex((t) => t.id === opt.id),
   );
+}
+export function mergeInsertVariants(questions: ConvertedQuestion[]): ConvertedQuestion[] {
+  const out: ConvertedQuestion[] = [];
+  for (const q of questions) {
+    const parent = out[out.length - 1];
+    const isVariant = /^\d+$/.test(q.id);
+    const parentIsInsert = parent && /^DV_INS/i.test(parent.id);
+    if (isVariant && parentIsInsert) {
+      const src = parent.showLogic.text?.match(/\bat\s+([A-Za-z0-9_]+)/i)?.[1] ?? "DV_Country";
+      const country = q.text.match(/[-–]\s*([A-Za-z]{2,3})\s*$/)?.[1];
+      const cond = q.showLogic.text ?? (country ? `Show if selected code [${country}] at ${src}` : null);
+      parent.options.push({
+        id: q.id, text: q.text, isExclusive: false, isAnchor: false, isAlwaysShown: false,
+        showLogic: { text: cond, condition: null },
+        terminateLogic: q.terminateLogic,
+      });
+      continue;
+    }
+    out.push(q);
+  }
+  return out;
 }
