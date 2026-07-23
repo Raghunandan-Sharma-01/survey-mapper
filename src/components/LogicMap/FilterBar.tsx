@@ -1,5 +1,6 @@
 import { Panel } from "reactflow";
 import { useSurveyStore } from "../../store/useSurveyStore";
+import { niceScroll } from "../../utils/ui";
 
 interface FilterBarProps {
   onFocus: () => void;
@@ -11,7 +12,7 @@ export default function FilterBar({ onFocus, onFit }: FilterBarProps) {
   const { chips, filter, toggleFilter, clearFilter } = useSurveyStore();
 
   return (
-    <Panel position="top-left" className="m-3 space-y-2 max-w-[620px]">
+    <Panel position="top-left" className="m-3 space-y-2 max-w-[620px] w-1/5">
       <div className="flex items-center gap-1 bg-white rounded-lg shadow px-2 py-1">
         <span className="text-[10px] font-semibold text-slate-500 mr-1">Layout</span>
         <span className="w-px h-4 bg-slate-200 mx-1" />
@@ -19,7 +20,7 @@ export default function FilterBar({ onFocus, onFit }: FilterBarProps) {
         <button onClick={onFit} className="text-[11px] rounded px-2 py-0.5 bg-slate-100 text-slate-700">⤢ Fit</button>
       </div>
       {chips.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1 bg-white/90 rounded-lg shadow px-2 py-1">
+        <div className={`flex flex-wrap items-start gap-1 bg-white/90 rounded-lg shadow px-2 py-1 overflow-y-auto max-h-100 overflow-y-scroll ${niceScroll}`} >
           {chips.map((c) => {
             const active = filter.includes(c.key);
             return (
