@@ -2,7 +2,7 @@
   "name": "survey-mapper",
   "private": true,
   "homepage": "https://raghunandan-sharma.github.io/survey-mapper/",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
